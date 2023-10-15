@@ -2,8 +2,6 @@
 using PdfApp.Domain.Abstractions;
 using PdfApp.Domain.Entities;
 using PdfApp.Domain.Exceptions;
-using PdfApp.Domain.Exceptionsp;
-using System.Security.Claims;
 using BC = BCrypt.Net.BCrypt;
 
 namespace PdfApp.Application.Services;
@@ -17,16 +15,16 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<User> GetByIdAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id)
                     ?? throw new UserNotFoundException(null, id);
         return user;
     }
 
-    public Task<User?> GetByEmailAsync(string email)
+    public async Task<User> GetByEmailAsync(string email)
     {
-        var user = _userRepository.GetByEmailAsync(email)
+        var user = await _userRepository.GetByEmailAsync(email)
                     ?? throw new UserNotFoundException(email, null);
         return user;
     }

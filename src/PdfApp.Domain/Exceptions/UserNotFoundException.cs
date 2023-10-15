@@ -1,7 +1,7 @@
 ﻿using PdfApp.Domain.Abstractions;
 using System.Net;
 
-namespace PdfApp.Domain.Exceptionsp;
+namespace PdfApp.Domain.Exceptions;
 
 public class UserNotFoundException : Exception, IServiceException
 {
