@@ -7,6 +7,7 @@ public class Pdf
     public string? Description { get; set; }
     public string? Author { get; set; }
     public int TotalPages { get; set; }
+    public string FileName { get; set; } = default!;
     public DateTime CreatedOn { get; set; }
     public DateTime? LastAccessedOn { get; set; } 
 }
