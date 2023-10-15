@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfApp.Presentation.Api", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfApp.Infrastructure.IoC", "src\PdfApp.Infrastructure.IoC\PdfApp.Infrastructure.IoC.csproj", "{B210C6EE-1C1B-409A-B0E9-C139927554F5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2DA2206F-6DE9-4E07-B78E-E0043F1EDB19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfApp.Application.Tests.Unit", "tests\PdfApp.Application.Tests.Unit\PdfApp.Application.Tests.Unit.csproj", "{2472B21C-6EB0-4391-9E86-26070B2221CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +51,10 @@ Global
 		{B210C6EE-1C1B-409A-B0E9-C139927554F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B210C6EE-1C1B-409A-B0E9-C139927554F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B210C6EE-1C1B-409A-B0E9-C139927554F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2472B21C-6EB0-4391-9E86-26070B2221CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2472B21C-6EB0-4391-9E86-26070B2221CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2472B21C-6EB0-4391-9E86-26070B2221CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2472B21C-6EB0-4391-9E86-26070B2221CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +66,7 @@ Global
 		{B94AE4F6-245D-48B8-B435-1D9503EE1C68} = {5CD805EB-E217-4720-9F1D-F31C4887BA54}
 		{EE60B1A1-EE44-41DC-932E-EE12BA8D3458} = {5CD805EB-E217-4720-9F1D-F31C4887BA54}
 		{B210C6EE-1C1B-409A-B0E9-C139927554F5} = {5CD805EB-E217-4720-9F1D-F31C4887BA54}
+		{2472B21C-6EB0-4391-9E86-26070B2221CF} = {2DA2206F-6DE9-4E07-B78E-E0043F1EDB19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF00EC72-9BED-4778-9B39-0DA8E5DC6950}
