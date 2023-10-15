@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PdfApp.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using PdfApp.Infrastructure.Persistence;
 namespace PdfApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231015181943_TagMigration")]
+    partial class TagMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,36 +55,6 @@ namespace PdfApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pdfs");
-                });
-
-            modelBuilder.Entity("PdfApp.Domain.Entities.Progress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Page")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PdfId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PdfId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Progresses");
                 });
 
             modelBuilder.Entity("PdfApp.Domain.Entities.Tag", b =>
@@ -140,21 +113,6 @@ namespace PdfApp.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("PdfApp.Domain.Entities.Progress", b =>
-                {
-                    b.HasOne("PdfApp.Domain.Entities.Pdf", null)
-                        .WithMany()
-                        .HasForeignKey("PdfId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PdfApp.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("PdfApp.Domain.Entities.Tag", b =>

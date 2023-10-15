@@ -10,6 +10,9 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = default!;
+    public DbSet<Pdf> Pdfs { get; set; } = default!;
+    public DbSet<Tag> Tags { get; set; } = default!;
+    public DbSet<Progress> Progresses { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,5 +22,32 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().Property(u => u.Email).IsRequired();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<User>().Property(u => u.PasswordHash).IsRequired();
+
+        modelBuilder.Entity<Pdf>().HasKey(p => p.Id);
+        modelBuilder.Entity<Pdf>().Property(p => p.Title).IsRequired();
+        modelBuilder.Entity<Pdf>().Property(p => p.TotalPages).IsRequired();
+        modelBuilder.Entity<Pdf>().Property(p => p.CreatedOn).IsRequired();
+
+        modelBuilder.Entity<Tag>().HasKey(p => p.Id);
+        modelBuilder.Entity<Tag>()
+            .HasOne<Pdf>()
+            .WithMany()
+            .HasForeignKey(p => p.PdfId)
+            .IsRequired();
+        modelBuilder.Entity<Tag>().Property(p => p.Name).IsRequired();
+
+        modelBuilder.Entity<Progress>().HasKey(p => p.Id);
+        modelBuilder.Entity<Progress>()
+            .HasOne<Pdf>()
+            .WithMany()
+            .HasForeignKey(p => p.PdfId)
+            .IsRequired();
+        modelBuilder.Entity<Progress>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(p => p.UserId)
+            .IsRequired();
+        modelBuilder.Entity<Progress>().Property(p => p.Name).IsRequired();
+        modelBuilder.Entity<Progress>().Property(p => p.Page).IsRequired();
     }
 }
