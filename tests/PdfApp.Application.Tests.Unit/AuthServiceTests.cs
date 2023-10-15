@@ -4,11 +4,6 @@ using PdfApp.Application.Abstractions;
 using PdfApp.Application.Config;
 using PdfApp.Application.Services;
 using PdfApp.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PdfApp.Application.Tests.Unit;
 
@@ -42,5 +37,18 @@ public class AuthServiceTests
 
         var token = _sut.GenerateUserToken(user);
         token.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void HashPassword_ReturnValidHashedPassword_WhenPasswordIsValid()
+    {
+        var password = "TestPassword";
+        var hashedPassword = _sut.HashPassword(password);
+        var isValidHashedPassword = _sut.VerifyPassword(password, hashedPassword);
+        var isotValidHashedPassword = _sut.VerifyPassword("wrongPassword", hashedPassword);
+
+        hashedPassword.Should().NotBeNull();
+        isValidHashedPassword.Should().BeTrue();
+        isotValidHashedPassword.Should().BeFalse();
     }
 }
