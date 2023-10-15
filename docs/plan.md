@@ -1,6 +1,6 @@
 # Entities
 
-Create database objectss and classes along these lines
+Create database objects and classes along these lines
 
 ```
 Pdf
