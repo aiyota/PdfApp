@@ -2,17 +2,18 @@
 using PdfApp.Domain.Abstractions;
 using PdfApp.Domain.Entities;
 using PdfApp.Domain.Exceptions;
-using BC = BCrypt.Net.BCrypt;
 
 namespace PdfApp.Application.Services;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IAuthService _authService;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IAuthService authService)
     {
         _userRepository = userRepository;
+        _authService = authService;
     }
 
     public async Task<User> GetByIdAsync(Guid id)
@@ -33,7 +34,7 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetByEmailAsync(email)
                     ?? throw new UserNotFoundException(email, null);
-        return VerifyPassword(password, user.PasswordHash);
+        return _authService.VerifyPassword(password, user.PasswordHash);
     }
 
     public async Task<User> RegisterAsync(
@@ -51,7 +52,7 @@ public class UserService : IUserService
             firstName,
             lastName,
             email,
-            HashPassword(password));
+            _authService.HashPassword(password));
     }
 
     public async Task<User> UpdateUserAsync(
@@ -68,24 +69,12 @@ public class UserService : IUserService
 
         var passwordHash = string.IsNullOrEmpty(password)
                             ? null
-                            : HashPassword(password);
+                            : _authService.HashPassword(password);
         return await _userRepository.UpdateAsync(
             userId,
             firstName,
             lastName,
             email,
             passwordHash);
-    }
-
-    public static string HashPassword(string password)
-    {
-        string salt = BC.GenerateSalt();
-        string hashedPassword = BC.HashPassword(password, salt);
-        return hashedPassword;
-    }
-
-    public static bool VerifyPassword(string password, string hashedPassword)
-    {
-        return BC.Verify(password, hashedPassword);
     }
 }

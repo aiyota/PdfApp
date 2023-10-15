@@ -6,6 +6,7 @@ using PdfApp.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BC = BCrypt.Net.BCrypt;
 
 namespace PdfApp.Application.Services;
 
@@ -43,5 +44,17 @@ public class AuthService : IAuthService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(securityToken);
+    }
+
+    public string HashPassword(string password)
+    {
+        string salt = BC.GenerateSalt();
+        string hashedPassword = BC.HashPassword(password, salt);
+        return hashedPassword;
+    }
+
+    public bool VerifyPassword(string password, string hashedPassword)
+    {
+        return BC.Verify(password, hashedPassword);
     }
 }
