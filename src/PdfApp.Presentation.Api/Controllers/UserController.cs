@@ -71,13 +71,13 @@ public class UserController : ApiControllerBase
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.User.Logout)]
-    public IActionResult Logout(HttpContext context)
+    public IActionResult Logout()
     {
         RemoveTokenFromCookies();
         return Ok();
     }
 
-    [HttpPost(ApiRoutes.User.UpdateCurrentUser)]
+    [HttpPatch(ApiRoutes.User.UpdateCurrentUser)]
     public async Task<IActionResult> UpdateCurrentUser(UserUpdateRequest request)
     {
         if (UserId is null)

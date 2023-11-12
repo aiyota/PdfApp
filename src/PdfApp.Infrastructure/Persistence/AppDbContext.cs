@@ -31,8 +31,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Tag>().HasKey(p => p.Id);
         modelBuilder.Entity<Tag>()
             .HasOne<Pdf>()
-            .WithMany()
-            .HasForeignKey(p => p.PdfId)
+            .WithMany(p => p.Tags)
+            .HasForeignKey(t => t.PdfId)
             .IsRequired();
         modelBuilder.Entity<Tag>().Property(p => p.Name).IsRequired();
 

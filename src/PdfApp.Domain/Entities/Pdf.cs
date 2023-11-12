@@ -8,6 +8,7 @@ public class Pdf
     public string? Author { get; set; }
     public int TotalPages { get; set; }
     public string FileName { get; set; } = default!;
+    public IEnumerable<Tag> Tags { get; set; } = default!;  
     public DateTime CreatedOn { get; set; }
     public DateTime? LastAccessedOn { get; set; } 
 }
