@@ -1,4 +1,5 @@
-﻿using PdfApp.Domain.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using PdfApp.Domain.Entities;
 
 namespace PdfApp.Application.Abstractions;
 
@@ -23,4 +24,5 @@ public interface IPdfService
         string? fileName,
         IEnumerable<Tag>? tags);
     Task DeleteAsync(int id);
+    Task UploadAsync(int id, IFormFile file);
 }

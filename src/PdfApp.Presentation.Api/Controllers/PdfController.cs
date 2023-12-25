@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 using PdfApp.Application.Abstractions;
 using PdfApp.Presentation.Api.Abstractions;
 using PdfApp.Presentation.Api.Contracts;
 using PdfApp.Presentation.Api.Contracts.Pdf;
 using PdfApp.Presentation.Api.Mapping;
+using PdfApp.Domain.Exceptions;
 
 namespace PdfApp.Presentation.Api.Controllers;
 [Route("api/[controller]")]
@@ -43,13 +45,24 @@ public class PdfController : ApiControllerBase
             request.Description,
             request.Author,
             request.TotalPages,
-            request.FileName,
+            CreatePdfFileName(),
             request.Tags);
 
         return CreatedAtAction(
             nameof(Get),
             new { id = pdf.Id },
             new { pdf = pdf.DomainToResponse() });
+    }
+
+    [HttpPost(ApiRoutes.Pdf.Upload)]
+    public async Task<IActionResult> Upload(int id, [FromForm] UploadPdfRequest request)
+    {
+        if (request.File.ContentType != MediaTypeNames.Application.Pdf)
+            throw new InvalidFileTypeException("PDF");
+
+        await _pdfService.UploadAsync(id, request.File);
+
+        return Ok();
     }
 
     [HttpPatch(ApiRoutes.Pdf.Update)]
@@ -73,5 +86,10 @@ public class PdfController : ApiControllerBase
         await _pdfService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    private static string CreatePdfFileName()
+    {
+        return Guid.NewGuid().ToString() + ".pdf";
     }
 }

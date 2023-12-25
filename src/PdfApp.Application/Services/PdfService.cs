@@ -1,4 +1,6 @@
-﻿using PdfApp.Application.Abstractions;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using PdfApp.Application.Abstractions;
 using PdfApp.Domain.Abstractions;
 using PdfApp.Domain.Entities;
 using PdfApp.Domain.Exceptions;
@@ -8,10 +10,12 @@ namespace PdfApp.Application.Services;
 public class PdfService : IPdfService
 {
     private readonly IPdfRepository _pdfRepository;
+    private readonly IConfiguration _configuration;
 
-    public PdfService(IPdfRepository pdfRepository)
+    public PdfService(IPdfRepository pdfRepository, IConfiguration configuration)
     {
         _pdfRepository = pdfRepository;
+        _configuration = configuration;
     }
 
     public async Task<Pdf> CreateAsync(
@@ -81,5 +85,20 @@ public class PdfService : IPdfService
                 ?? throw new PdfNotFoundException();
 
         return updated;
+    }
+
+    public async Task UploadAsync(int id, IFormFile file)
+    {
+        var pdfRecord = await _pdfRepository.GetByIdAsync(id) 
+            ?? throw new PdfNotFoundException();
+
+
+
+        string pdfFilePath = _configuration.GetValue<string>("PdfFilePath")!;
+        string filePath = Path.Combine(pdfFilePath, pdfRecord.FileName);
+
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
     }
 }
