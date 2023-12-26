@@ -30,7 +30,8 @@ public class PdfRepository : IPdfRepository
             TotalPages = totalPages,
             FileName = fileName,
             Tags = tags.ToList(),
-            HasFile = hasFile ?? false
+            HasFile = hasFile ?? false,
+            CreatedOn = DateTime.Now
         };
 
         var result = await _dbContext.Pdfs.AddAsync(pdf);
