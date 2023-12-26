@@ -11,5 +11,5 @@ public record CreatePdfRequest
     public string? Author { get; init; }
     [Required]
     public int TotalPages { get; init; }
-    public IEnumerable<Tag> Tags { get; init; } = Enumerable.Empty<Tag>();
+    public IEnumerable<PdfTagRequest> Tags { get; init; } = Enumerable.Empty<PdfTagRequest>();
 };

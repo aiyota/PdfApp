@@ -19,7 +19,8 @@ public class PdfRepository : IPdfRepository
         string? author,
         int totalPages,
         string fileName,
-        IEnumerable<Tag> tags)
+        IEnumerable<Tag> tags,
+        bool? hasFile)
     {
         var pdf = new Pdf
         {
@@ -28,7 +29,8 @@ public class PdfRepository : IPdfRepository
             Author = author,
             TotalPages = totalPages,
             FileName = fileName,
-            Tags = tags.ToList()
+            Tags = tags.ToList(),
+            HasFile = hasFile ?? false
         };
 
         var result = await _dbContext.Pdfs.AddAsync(pdf);

@@ -24,7 +24,8 @@ public class PdfService : IPdfService
         string? author,
         int totalPages,
         string fileName,
-        IEnumerable<Tag> tags)
+        IEnumerable<Tag> tags,
+        bool? hasFile)
     {
         var created = await _pdfRepository.CreateAsync(
             title,
@@ -32,7 +33,8 @@ public class PdfService : IPdfService
             author,
             totalPages,
             fileName,
-            tags) 
+            tags, 
+            hasFile) 
                 ?? throw new PdfNotFoundException();
 
         return created;

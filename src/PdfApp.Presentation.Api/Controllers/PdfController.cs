@@ -53,7 +53,8 @@ public class PdfController : ApiControllerBase
             request.Author,
             request.TotalPages,
             CreatePdfFileName(),
-            request.Tags);
+            request.Tags.RequestToDomain(),
+            false);
 
         return CreatedAtAction(
             nameof(Get),
@@ -82,7 +83,7 @@ public class PdfController : ApiControllerBase
             request.Author,
             request.TotalPages,
             request.FileName,
-            request.Tags);
+            request.Tags?.RequestToDomain());
 
         return Ok(new { pdf = pdf.DomainToResponse() });
     }

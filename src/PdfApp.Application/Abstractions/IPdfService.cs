@@ -11,7 +11,8 @@ public interface IPdfService
         string? author,
         int totalPages,
         string fileName,
-        IEnumerable<Tag> tags);
+        IEnumerable<Tag> tags,
+        bool? hasFile);
     Task<Pdf> GetByIdAsync(int id);
     Task<IList<Pdf>> GetAllAsync();
     Task<IList<Pdf>> GetByTitleAsync(string title);
