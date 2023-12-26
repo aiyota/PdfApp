@@ -72,7 +72,8 @@ public class PdfService : IPdfService
         string? author,
         int? totalPages,
         string? fileName,
-        IEnumerable<Tag>? tags)
+        IEnumerable<Tag>? tags,
+        bool? hasFile)
     {
         var updated = await _pdfRepository.UpdateAsync(
             id,
@@ -81,7 +82,8 @@ public class PdfService : IPdfService
             author,
             totalPages,
             fileName,
-            tags)
+            tags,
+            hasFile)
                 ?? throw new PdfNotFoundException();
 
         return updated;
@@ -92,13 +94,21 @@ public class PdfService : IPdfService
         var pdfRecord = await _pdfRepository.GetByIdAsync(id) 
             ?? throw new PdfNotFoundException();
 
-
-
         string pdfFilePath = _configuration.GetValue<string>("PdfFilePath")!;
         string filePath = Path.Combine(pdfFilePath, pdfRecord.FileName);
 
         using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
+        await _pdfRepository.UpdateAsync(id, hasFile: true);
+    }
 
+    public async Task<byte[]> GetPdfFileAsync(string fileName)
+    {
+        string pdfFilePath = _configuration.GetValue<string>("PdfFilePath")!;
+        string filePath = Path.Combine(pdfFilePath, fileName);
+        if (!File.Exists(filePath))
+            throw new PdfNotFoundException();
+
+        return await File.ReadAllBytesAsync(filePath); 
     }
 }

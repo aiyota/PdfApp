@@ -75,7 +75,9 @@ public class PdfRepository : IPdfRepository
         string? author = null,
         int? totalPages = null,
         string? fileName = null,
-        IEnumerable<Tag>? tags = null)
+        IEnumerable<Tag>? tags = null,
+        bool? hasFile = null
+        )
     {
         var pdf = await _dbContext.Pdfs
            .Include(p => p.Tags)
@@ -88,6 +90,7 @@ public class PdfRepository : IPdfRepository
         pdf.TotalPages = totalPages ?? pdf.TotalPages;
         pdf.FileName = fileName ?? pdf.FileName;
         pdf.Tags = tags?.ToList() ?? pdf.Tags;
+        pdf.HasFile = hasFile ?? pdf.HasFile;
 
         await _dbContext.SaveChangesAsync();
 

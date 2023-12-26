@@ -19,6 +19,7 @@ public static class ApiRoutes
     {
         public const string Name = Base + "pdf";
         public const string Get = "";
+        public const string GetFile = "file/{fileName}";
         public const string GetById = "{id}";
         public const string Create = "";
         public const string Upload = "{id}";

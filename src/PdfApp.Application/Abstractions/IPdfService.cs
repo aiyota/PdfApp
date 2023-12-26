@@ -17,12 +17,14 @@ public interface IPdfService
     Task<IList<Pdf>> GetByTitleAsync(string title);
     Task<Pdf> UpdateAsync(
         int id,
-        string? title,
-        string? description,
-        string? author,
-        int? totalPages,
-        string? fileName,
-        IEnumerable<Tag>? tags);
+        string? title = null,
+        string? description = null,
+        string? author = null,
+        int? totalPages = null,
+        string? fileName = null,
+        IEnumerable<Tag>? tags = null,
+        bool? hasFile = null);
     Task DeleteAsync(int id);
     Task UploadAsync(int id, IFormFile file);
+    Task<byte[]> GetPdfFileAsync(string fileName);
 }

@@ -11,4 +11,5 @@ public class Pdf
     public IEnumerable<Tag> Tags { get; set; } = default!;  
     public DateTime CreatedOn { get; set; }
     public DateTime? LastAccessedOn { get; set; } 
+    public bool? HasFile { get; set; }
 }

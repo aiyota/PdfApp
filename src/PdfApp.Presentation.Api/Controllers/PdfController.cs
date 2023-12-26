@@ -29,6 +29,13 @@ public class PdfController : ApiControllerBase
         return Ok(new { pdfs = pdfs.DomainToResponse() });
     }
 
+    [HttpGet(ApiRoutes.Pdf.GetFile)]
+    public async Task<IActionResult> GetFile(string fileName)
+    {
+        var file = await _pdfService.GetPdfFileAsync(fileName);
+        return File(file, MediaTypeNames.Application.Pdf);
+    }
+
     [HttpGet(ApiRoutes.Pdf.GetById)]
     public async Task<IActionResult> Get(int id)
     {
