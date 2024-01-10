@@ -3,10 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SearchPdfComponent } from './search-pdf/search-pdf.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SearchPdfComponent
   ],
   imports: [
     BrowserModule,
