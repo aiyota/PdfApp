@@ -14,7 +14,7 @@ public static class PdfMappings
             Author = pdf.Author,
             TotalPages = pdf.TotalPages,
             FileName = pdf.FileName,
-            Tags = pdf.Tags,
+            Tags = pdf.Tags.Select(t => new TagResponse { Id = t.Id, Name = t.Name }),
             CreatedOn = pdf.CreatedOn,
             LastAccessedOn = pdf.LastAccessedOn
         };

@@ -25,4 +25,5 @@ public interface IPdfRepository
         IEnumerable<Tag>? tags = null,
         bool? hasFile = null);
     Task DeleteAsync(int id);
+    Task<IEnumerable<Tag>> GetAllTagsAsync();
 }

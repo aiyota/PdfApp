@@ -10,7 +10,7 @@ public record PdfResponse
     public string? Author { get; init; }
     public int TotalPages { get; init; }
     public string FileName { get; init; } = default!;
-    public IEnumerable<Tag> Tags { get; init; } = Enumerable.Empty<Tag>();
+    public IEnumerable<TagResponse> Tags { get; init; } = Enumerable.Empty<TagResponse>();
     public DateTime CreatedOn { get; init; }
     public DateTime? LastAccessedOn { get; init; }
 }

@@ -22,6 +22,7 @@ public class PdfRepository : IPdfRepository
         IEnumerable<Tag> tags,
         bool? hasFile)
     {
+        var tagsToAdd = await CreateTagListAsync(tags);
         var pdf = new Pdf
         {
             Title = title,
@@ -29,10 +30,12 @@ public class PdfRepository : IPdfRepository
             Author = author,
             TotalPages = totalPages,
             FileName = fileName,
-            Tags = tags.ToList(),
+            Tags = tagsToAdd,
             HasFile = hasFile ?? false,
             CreatedOn = DateTime.Now
         };
+
+
 
         var result = await _dbContext.Pdfs.AddAsync(pdf);
         await _dbContext.SaveChangesAsync();
@@ -99,4 +102,25 @@ public class PdfRepository : IPdfRepository
 
         return pdf;
     }
+
+    public async Task<IEnumerable<Tag>> GetAllTagsAsync()
+    {
+        return await _dbContext.Tags.ToListAsync();
+    }
+
+    /// <summary>
+    /// Creates a list of tags to add to the database taking the existing tags into consideration.
+    /// </summary>
+    private async Task<IList<Tag>> CreateTagListAsync(IEnumerable<Tag> tags)
+    {
+        IList<Tag> tagsToAdd = new List<Tag>();
+        foreach (var tag in tags)
+        {
+            var existingTag = await _dbContext.Tags.FirstOrDefaultAsync(t => t.Name == tag.Name);
+            tagsToAdd.Add(existingTag ?? tag);
+        }
+
+        return tagsToAdd;
+    }
+
 }

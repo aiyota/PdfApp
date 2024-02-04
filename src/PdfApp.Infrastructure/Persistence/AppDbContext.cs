@@ -27,14 +27,13 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Pdf>().Property(p => p.Title).IsRequired();
         modelBuilder.Entity<Pdf>().Property(p => p.TotalPages).IsRequired();
         modelBuilder.Entity<Pdf>().Property(p => p.CreatedOn).IsRequired();
+        modelBuilder.Entity<Pdf>()
+            .HasMany(e => e.Tags)
+            .WithMany(e => e.Pdf);
 
         modelBuilder.Entity<Tag>().HasKey(p => p.Id);
-        modelBuilder.Entity<Tag>()
-            .HasOne<Pdf>()
-            .WithMany(p => p.Tags)
-            .HasForeignKey(t => t.PdfId)
-            .IsRequired();
         modelBuilder.Entity<Tag>().Property(p => p.Name).IsRequired();
+        modelBuilder.Entity<Tag>().HasIndex(p => p.Name).IsUnique();
 
         modelBuilder.Entity<Progress>().HasKey(p => p.Id);
         modelBuilder.Entity<Progress>()
