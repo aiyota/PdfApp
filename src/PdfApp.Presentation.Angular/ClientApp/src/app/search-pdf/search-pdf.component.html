@@ -1,1 +1,5 @@
-<input type="text" placeholder="Search PDF's" />
+<div class="container">
+  <h1>Search Pdfs</h1>
+  <input type="text" (keyup)="searchPdf($event)" placeholder="Search PDF's" />
+  <app-pdf-list [pdfs]="pdfs"></app-pdf-list>
+</div>

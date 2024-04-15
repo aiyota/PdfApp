@@ -72,6 +72,18 @@ public static class DependencyInjection
                 };
             });
 
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+                builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200") // hardcode for now
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                });
+        });
+
         return services;
     }
 }

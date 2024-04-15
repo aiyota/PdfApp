@@ -1,0 +1,8 @@
+<ng-container *ngIf="!!pdf; else noPdf">
+  <h1>{{ pdf.title }}</h1>
+  <p>{{ pdf.description }}</p>
+</ng-container>
+
+<ng-template #noPdf>
+  <p>No PDF found</p>
+</ng-template>
