@@ -366,3 +366,4 @@ FodyWeavers.xsd
 
 # Don't include test PDFs
 test-files/
+/TestPdfFiles
