@@ -20,6 +20,7 @@ export type Pdf = {
   tags: Tag[];
   createdOn: string;
   lastAccessed: string;
+  hasFile: boolean;
 };
 
 export type Tag = {

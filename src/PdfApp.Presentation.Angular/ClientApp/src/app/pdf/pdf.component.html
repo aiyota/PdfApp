@@ -1,6 +1,18 @@
 <ng-container *ngIf="!!pdf; else noPdf">
   <h1>{{ pdf.title }}</h1>
   <p>{{ pdf.description }}</p>
+
+  <embed
+    *ngIf="pdf.hasFile; else noPdfFile"
+    [src]="pdfSrcSafe"
+    type="application/pdf"
+    width="100%"
+    height="100%"
+  />
+
+  <ng-template #noPdfFile>
+    <p>No file uploaded for this pdf</p>
+  </ng-template>
 </ng-container>
 
 <ng-template #noPdf>

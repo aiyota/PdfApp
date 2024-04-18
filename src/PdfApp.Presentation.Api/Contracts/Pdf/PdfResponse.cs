@@ -13,4 +13,5 @@ public record PdfResponse
     public IEnumerable<TagResponse> Tags { get; init; } = Enumerable.Empty<TagResponse>();
     public DateTime CreatedOn { get; init; }
     public DateTime? LastAccessedOn { get; init; }
+    public bool HasFile { get; set; }
 }

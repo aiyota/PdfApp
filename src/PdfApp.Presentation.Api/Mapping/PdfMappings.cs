@@ -16,7 +16,8 @@ public static class PdfMappings
             FileName = pdf.FileName,
             Tags = pdf.Tags.Select(t => new TagResponse { Id = t.Id, Name = t.Name }),
             CreatedOn = pdf.CreatedOn,
-            LastAccessedOn = pdf.LastAccessedOn
+            LastAccessedOn = pdf.LastAccessedOn,
+            HasFile = pdf.HasFile ?? false
         };
 
     public static IList<PdfResponse> DomainToResponse(this IList<Pdf> pdfs) =>
