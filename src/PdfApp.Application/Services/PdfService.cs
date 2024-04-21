@@ -47,6 +47,8 @@ public class PdfService : IPdfService
             throw new PdfNotFoundException();
 
         await _pdfRepository.DeleteAsync(id);
+
+        DeletePdfFile(pdf.FileName);
     }
 
     public async Task<IList<Pdf>> GetAllAsync()
@@ -112,5 +114,16 @@ public class PdfService : IPdfService
             throw new PdfNotFoundException();
 
         return await File.ReadAllBytesAsync(filePath); 
+    }
+
+    private bool DeletePdfFile(string fileName)
+    {
+        string pdfFilePath = _configuration.GetValue<string>("PdfFilePath")!;
+        string filePath = Path.Combine(pdfFilePath, fileName);
+        if (!File.Exists(filePath))
+            return false;
+   
+        File.Delete(filePath);
+        return true;
     }
 }

@@ -91,6 +91,10 @@ public class PdfController : ApiControllerBase
     [HttpDelete(ApiRoutes.Pdf.Delete)]
     public async Task<IActionResult> Delete(int id)
     {
+        var pdf = await _pdfService.GetByIdAsync(id);
+        if (pdf is null)
+            throw new PdfNotFoundException();
+
         await _pdfService.DeleteAsync(id);
 
         return NoContent();

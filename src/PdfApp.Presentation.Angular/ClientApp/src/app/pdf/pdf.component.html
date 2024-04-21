@@ -1,6 +1,10 @@
 <ng-container *ngIf="!!pdf; else noPdf">
-  <h1>{{ pdf.title }}</h1>
-  <p>{{ pdf.description }}</p>
+  <div class="container">
+    <h1>{{ pdf.title }}</h1>
+    <p>{{ pdf.description }}</p>
+
+    <button (click)="deletePdf()">Delete</button>
+  </div>
 
   <embed
     *ngIf="pdf.hasFile; else noPdfFile"
@@ -9,12 +13,19 @@
     width="100%"
     height="100%"
   />
-
   <ng-template #noPdfFile>
-    <p>No file uploaded for this pdf</p>
+    <div class="container">
+      <form (submit)="uploadPdf($event)">
+        <p>No file uploaded for this pdf</p>
+        <input type="file" (change)="onFileSelected($event)" />
+        <button type="submit" [disabled]="!selectedFile">Upload</button>
+      </form>
+    </div>
   </ng-template>
 </ng-container>
 
 <ng-template #noPdf>
-  <p>No PDF found</p>
+  <div class="container">
+    <p>No PDF found</p>
+  </div>
 </ng-template>

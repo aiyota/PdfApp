@@ -1,12 +1,12 @@
 import { Inject } from '@angular/core';
-import { get, post } from '../api/api-utils';
+import { httpGet, httpPost } from '../api/api-utils';
 import { LoginRequest, User } from '../api/api.types';
 
 @Inject({ providedIn: 'root' })
 export default class AuthService {
   async login(email: string, password: string): Promise<User> {
     // hardcoded url for now
-    const response = await post<LoginRequest, { user?: User }>(
+    const response = await httpPost<LoginRequest, { user?: User }>(
       'https://localhost:7017/api/User/login',
       {
         email,
@@ -22,7 +22,7 @@ export default class AuthService {
   }
 
   async getLoggedInUser(): Promise<User> {
-    const response = await get<{ user: User }>(
+    const response = await httpGet<{ user: User }>(
       'https://localhost:7017/api/User/me'
     );
 

@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   DomSanitizer,
   SafeResourceUrl,
   Title,
 } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Pdf } from 'src/api/api.types';
-import PdfService from 'src/services/pdf.service';
+import { Pdf } from 'src/app/api/api.types';
+import PdfService from 'src/app/services/pdf.service';
 
 @Component({
   selector: 'app-pdf',
@@ -16,10 +17,12 @@ import PdfService from 'src/services/pdf.service';
 export class PdfComponent {
   pdf?: Pdf;
   pdfSrcSafe?: SafeResourceUrl;
+  selectedFile: File | null = null;
 
   constructor(
     private _pdfService: PdfService,
     private _route: ActivatedRoute,
+    private _router: Router,
     private _titleService: Title,
     private _sanitizer: DomSanitizer
   ) {}
@@ -42,5 +45,43 @@ export class PdfComponent {
 
   private setTitle(title: string) {
     this._titleService.setTitle(title);
+  }
+
+  onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file: File = (target.files as FileList)[0];
+    this.selectedFile = file;
+  }
+
+  async uploadPdf(event: Event) {
+    event.preventDefault();
+    if (!this.selectedFile || !this.pdf) {
+      return;
+    }
+
+    await this._pdfService.uploadPdf(this.pdf.id, this.selectedFile);
+    const pdf = await this._pdfService.getPdf(this.pdf.id);
+    if (pdf) {
+      this.pdf = pdf;
+      this.setPdfSrc(pdf, 1);
+      this.setTitle(pdf.title);
+      return;
+    }
+
+    alert('Failed to upload PDF');
+  }
+
+  deletePdf() {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this PDF?'
+    );
+
+    if (!confirmed || !this.pdf) {
+      return;
+    }
+
+    this._pdfService.deletePdf(this.pdf.id);
+
+    this._router.navigate(['/']);
   }
 }

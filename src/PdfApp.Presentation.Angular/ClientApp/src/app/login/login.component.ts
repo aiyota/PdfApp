@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import AuthService from 'src/services/auth.service';
+import AuthService from 'src/app/services/auth.service';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,7 @@ import AuthService from 'src/services/auth.service';
 export class LoginComponent {
   private _email: string = '';
   private _password: string = '';
+  public isLoading: boolean = false;
 
   constructor(private _authService: AuthService, private _router: Router) {}
 
@@ -22,19 +24,22 @@ export class LoginComponent {
     this._password = ($event.target as HTMLInputElement).value;
   }
 
-  async ngOnInit() {
-    const isLoggedIn = await this._authService.isLoggedIn();
-    console.log(isLoggedIn);
-  }
-
   async login($event: SubmitEvent): Promise<void> {
     $event.preventDefault();
 
     try {
+      this.isLoading = true;
       const user = await this._authService.login(this._email, this._password);
-      this._router.navigate(['/']);
+      this.isLoading = false;
+
+      if (user) {
+        this._router.navigate(['/']);
+        return;
+      }
+      // Handle error
     } catch (error) {
       alert(error);
+      this.isLoading = false;
     }
   }
 }

@@ -27,3 +27,11 @@ export type Tag = {
   id: number;
   name: string;
 };
+
+export type PdfUploadRequest = {
+  title: string;
+  description: string;
+  author: string;
+  totalPages: number;
+  tags: Tag[];
+};

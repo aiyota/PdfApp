@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Pdf } from 'src/api/api.types';
+import { Pdf } from 'src/app/api/api.types';
 
 @Component({
   selector: 'app-pdf-list',

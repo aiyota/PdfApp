@@ -1,0 +1,64 @@
+<div class="container">
+  <h1>Pdf Upload</h1>
+  <form [formGroup]="uploadForm" (ngSubmit)="uploadPdf()">
+    <div class="form-control">
+      <label for="title">Title</label>
+      <input formControlName="title" type="text" placeholder="Title" />
+
+      <p *ngIf="titleIsInvalid" class="invalid-feedback">
+        This field is required
+      </p>
+    </div>
+
+    <div class="form-control">
+      <label for="description">Description</label>
+      <input
+        formControlName="description"
+        type="text"
+        placeholder="Description"
+      />
+
+      <p *ngIf="descriptionIsInvalid" class="invalid-feedback">
+        This field is required
+      </p>
+    </div>
+
+    <div class="form-control">
+      <label for="author">Author</label>
+      <input formControlName="author" type="text" placeholder="Author" />
+
+      <p *ngIf="authorIsInvalid" class="invalid-feedback">
+        This field is required
+      </p>
+    </div>
+
+    <div class="form-control">
+      <label for="totalPages">Total Pages</label>
+      <input
+        formControlName="totalPages"
+        type="number"
+        placeholder="Total Pages"
+        min="1"
+      />
+      <p *ngIf="totalPagesAreInvalid" class="invalid-feedback">
+        Must be at least 1 page
+      </p>
+    </div>
+
+    <!-- TODO TAGS -->
+
+    <div class="form-control">
+      <label for="pdfUpload">PDF Upload</label>
+      <input
+        formControlName="pdfUpload"
+        type="file"
+        (change)="onFileChange($event)"
+      />
+
+      <p *ngIf="pdfUploadIsInvalid" class="invalid-feedback">
+        Must upload a PDF
+      </p>
+    </div>
+    <button type="submit" [disabled]="uploadForm.invalid">Submit</button>
+  </form>
+</div>

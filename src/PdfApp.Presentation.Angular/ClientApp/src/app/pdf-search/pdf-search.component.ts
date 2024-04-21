@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Pdf } from 'src/api/api.types';
-import AuthService from 'src/services/auth.service';
-import PdfService from 'src/services/pdf.service';
-import { makeDebouncer } from 'src/utils';
+import { Pdf } from 'src/app/api/api.types';
+import AuthService from 'src/app/services/auth.service';
+import PdfService from 'src/app/services/pdf.service';
+import { makeDebouncer } from 'src/app/utils';
 
 @Component({
   selector: 'app-search-pdf',
-  templateUrl: './search-pdf.component.html',
-  styleUrls: ['./search-pdf.component.scss'],
+  templateUrl: './pdf-search.component.html',
+  styleUrls: ['./pdf-search.component.scss'],
 })
 export class SearchPdfComponent {
   private debouncer = makeDebouncer<Pdf[]>(500);
