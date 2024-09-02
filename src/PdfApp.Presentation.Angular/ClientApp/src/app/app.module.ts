@@ -14,6 +14,7 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
 import { SharedModule } from './shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PdfUploadComponent } from './pdf-upload/pdf-upload.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,13 @@ import { PdfUploadComponent } from './pdf-upload/pdf-upload.component';
     LoginComponent,
     PdfUploadComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, SharedModule, ReactiveFormsModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+  ],
   providers: [AuthService, PdfService],
   bootstrap: [AppComponent],
 })

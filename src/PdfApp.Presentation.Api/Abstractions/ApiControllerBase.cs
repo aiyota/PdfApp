@@ -9,15 +9,6 @@ namespace PdfApp.Presentation.Api.Abstractions;
 [ApiController]
 public abstract class ApiControllerBase : ControllerBase
 {
-    public Guid? UserId
-    {
-        get
-        {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            return (userId is null) ? null : Guid.Parse(userId);
-        }
-    }
-
     /// <summary>
     /// Sets token as an HTTP Only cookie on the response.
     /// </summary>

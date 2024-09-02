@@ -5,6 +5,15 @@ export type User = {
   email: string;
 };
 
+/**
+ * The user object that is generated from the token.
+ */
+export type ClaimsUser = {
+  id: string;
+  email: string;
+  userName: string;
+};
+
 export type LoginRequest = {
   email: string;
   password: string;

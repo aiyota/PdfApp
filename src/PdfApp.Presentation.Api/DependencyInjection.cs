@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PdfApp.Application.Config;
@@ -75,9 +76,17 @@ public static class DependencyInjection
         services.AddCors(options =>
         {
             options.AddPolicy("AllowSpecificOrigin",
-                builder =>
+            builder =>
+            {
+                string[] allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+                                            ?? [];
+                if (allowedOrigins.Length == 0)
                 {
-                    builder.WithOrigins("http://localhost:4200") // hardcode for now
+                    throw new Exception("AllowedOrigins is empty. Please set them in appSettings.json.");
+                }
+
+                builder.WithOrigins(
+                        allowedOrigins)
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();

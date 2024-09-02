@@ -46,6 +46,44 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(securityToken);
     }
 
+    public ClaimsUser? GetUserFromToken(string token)
+    {
+        var claimsPrincipal = GetPrinciplesFromToken(token);
+        return GetUserFromClaimsPrinciple(claimsPrincipal);
+    }
+
+    public ClaimsUser? GetUserFromClaimsPrinciple(ClaimsPrincipal claimsPrincipal)
+    {
+        var id = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var email = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userName = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+        if (id is null || email is null || userName is null)
+            return null;
+
+        return new ClaimsUser
+        {
+            Id = Guid.Parse(id),
+            Email = email,
+            UserName = userName
+        };
+    }
+
+    private ClaimsPrincipal GetPrinciplesFromToken(string token)
+    {
+        var validation = new TokenValidationParameters
+        {
+            ValidIssuer = _jwtSettings.Issuer,
+            ValidAudience = _jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret!)),
+            ValidateLifetime = false
+        };
+
+        var claimsPrinciple = new JwtSecurityTokenHandler().ValidateToken(token, validation, out _)
+            ?? throw new SecurityTokenException("Invalid token");
+
+        return claimsPrinciple;
+    }
+
     public string HashPassword(string password)
     {
         string salt = BC.GenerateSalt();

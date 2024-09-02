@@ -1,30 +1,21 @@
-import { Inject } from '@angular/core';
-import { httpGet, httpPost } from '../api/api-utils';
-import { LoginRequest, User } from '../api/api.types';
+import { Injectable } from '@angular/core';
+import { httpGet } from '../api/api-utils';
+import { ClaimsUser, User } from '../api/api.types';
+import { environment } from 'src/environments/environment';
 
-@Inject({ providedIn: 'root' })
+@Injectable({ providedIn: 'root' })
 export default class AuthService {
-  async login(email: string, password: string): Promise<User> {
-    // hardcoded url for now
-    const response = await httpPost<LoginRequest, { user?: User }>(
-      'https://localhost:7017/api/User/login',
-      {
-        email,
-        password,
-      }
+  baseUrl: string = environment.apiUrl;
+
+  async login(token: string): Promise<ClaimsUser> {
+    const response = await httpGet<{ user: ClaimsUser }>(
+      `${this.baseUrl}/User/login?token=${token}`
     );
-
-    if (!response.user) {
-      throw new Error('Invalid credentials');
-    }
-
-    return response.user as User;
+    return response.user as ClaimsUser;
   }
 
   async getLoggedInUser(): Promise<User> {
-    const response = await httpGet<{ user: User }>(
-      'https://localhost:7017/api/User/me'
-    );
+    const response = await httpGet<{ user: User }>(`${this.baseUrl}/User/me`);
 
     return response.user as User;
   }
