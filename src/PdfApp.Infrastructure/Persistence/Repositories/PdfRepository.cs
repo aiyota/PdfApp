@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PdfApp.Domain.Abstractions;
 using PdfApp.Domain.Entities;
+using System.Globalization;
 
 namespace PdfApp.Infrastructure.Persistence.Repositories;
 
@@ -95,17 +96,62 @@ public class PdfRepository : IPdfRepository
         pdf.Author = author ?? pdf.Author;
         pdf.TotalPages = totalPages ?? pdf.TotalPages;
         pdf.FileName = fileName ?? pdf.FileName;
-        pdf.Tags = tags?.ToList() ?? pdf.Tags;
+        //pdf.Tags = tags?.ToList() ?? pdf.Tags;
         pdf.HasFile = hasFile ?? pdf.HasFile;
+
+        await AddTagsToPdfAsync(tags, pdf);
 
         await _dbContext.SaveChangesAsync();
 
         return pdf;
     }
 
+    private async Task AddTagsToPdfAsync(IEnumerable<Tag>? tags, Pdf pdf)
+    {
+        var tagNames = tags?.Select(t => t.Name.ToLower()).ToList();
+        if (tagNames != null)
+        {
+            var existingTags = await _dbContext.Tags
+                .Where(t => tagNames.Contains(t.Name.ToLower()))
+                .ToListAsync();
+
+            var newTagNames = tagNames.Except(existingTags.Select(t => t.Name.ToLower())).ToList();
+
+            // for title casing
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+            var newTags = newTagNames
+                .Select(name => new Tag { Name = textInfo.ToTitleCase(name) })
+                .ToList();
+            _dbContext.Tags.AddRange(newTags);
+
+            // Combine existing and new tags
+            var allTags = existingTags.Concat(newTags).ToList();
+
+            var currentTags = pdf.Tags.ToList();
+
+            // Remove tags that are no longer associated
+            var tagsToRemove = currentTags.Except(allTags).ToList();
+            foreach (var tag in tagsToRemove)
+            {
+                _dbContext.Entry(pdf).Collection(p => p.Tags).Load(); // Ensure the collection is loaded
+                ((ICollection<Tag>)pdf.Tags).Remove(tag);
+            }
+
+            // Add new tags
+            var tagsToAdd = allTags.Except(currentTags).ToList();
+            foreach (var tag in tagsToAdd)
+            {
+                _dbContext.Entry(pdf).Collection(p => p.Tags).Load(); // Ensure the collection is loaded
+                ((ICollection<Tag>)pdf.Tags).Add(tag);
+            }
+        }
+    }
+
     public async Task<IEnumerable<Tag>> GetAllTagsAsync()
     {
-        return await _dbContext.Tags.ToListAsync();
+        return await _dbContext.Tags
+            .Include(t => t.Pdf)
+            .ToListAsync();
     }
 
     /// <summary>

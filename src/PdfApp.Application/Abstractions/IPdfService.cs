@@ -28,4 +28,5 @@ public interface IPdfService
     Task DeleteAsync(int id);
     Task UploadAsync(int id, IFormFile file);
     Task<byte[]> GetPdfFileAsync(string fileName);
+    Task<IEnumerable<Tag>> GetTagsAsync();
 }

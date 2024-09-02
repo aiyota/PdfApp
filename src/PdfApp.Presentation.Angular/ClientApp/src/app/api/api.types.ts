@@ -37,10 +37,14 @@ export type Tag = {
   name: string;
 };
 
+export type TagRequest = {
+  name: string;
+};
+
 export type PdfUploadRequest = {
   title: string;
   description: string;
   author: string;
   totalPages: number;
-  tags: Tag[];
+  tags: TagRequest[];
 };

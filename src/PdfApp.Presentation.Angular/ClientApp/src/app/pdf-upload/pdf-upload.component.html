@@ -45,7 +45,24 @@
       </p>
     </div>
 
-    <!-- TODO TAGS -->
+    <div class="form-control">
+      <label for="totalPages">Tags</label>
+      <input
+        formControlName="tags"
+        type="text"
+        placeholder="Tags"
+        (keyup)="tagsOnType()"
+      />
+      <p
+        *ngIf="displayNewTags && uploadForm.controls.tags.value"
+        class="info-feedback"
+      >
+        <span>New tags to be added:</span><br />
+        <span
+          ><strong>{{ newTags }}</strong></span
+        >
+      </p>
+    </div>
 
     <div class="form-control">
       <label for="pdfUpload">PDF Upload</label>

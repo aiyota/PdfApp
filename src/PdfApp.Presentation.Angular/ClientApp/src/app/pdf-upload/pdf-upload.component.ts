@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import PdfService from '../services/pdf.service';
-import { Tag } from '../api/api.types';
+import { Tag, TagRequest } from '../api/api.types';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,19 +9,27 @@ import { Router } from '@angular/router';
   templateUrl: './pdf-upload.component.html',
   styleUrls: ['./pdf-upload.component.scss'],
 })
-export class PdfUploadComponent {
+export class PdfUploadComponent implements OnInit {
   pdfUploadFile: File | null = null;
+  existingTags: string[] = [];
+  displayNewTags = false;
 
   uploadForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
     description: new FormControl('', [Validators.required]),
     author: new FormControl('', [Validators.required]),
     totalPages: new FormControl(0, [Validators.min(1)]),
-    // tags: new FormControl([]), TODO
+    tags: new FormControl(''),
     pdfUpload: new FormControl<File | null>(null, [Validators.required]),
   });
 
   constructor(private _pdfService: PdfService, private _router: Router) {}
+
+  ngOnInit(): void {
+    this._pdfService.getAllTags().then((tags) => {
+      this.existingTags = tags.map((tag) => tag.name.toLowerCase());
+    });
+  }
 
   get titleIsInvalid() {
     return this.getValidStatus('title', ['required']);
@@ -68,7 +76,7 @@ export class PdfUploadComponent {
       description: this.uploadForm.controls.description.value!.trim(),
       author: this.uploadForm.controls.author.value!.trim(),
       totalPages: this.uploadForm.controls.totalPages.value!,
-      tags: [] as Tag[],
+      tags: this.getTagsToUpload(),
     };
 
     // get id
@@ -79,5 +87,31 @@ export class PdfUploadComponent {
     await this._pdfService.uploadPdf(newPdf.id, this.pdfUploadFile!);
 
     this._router.navigate(['/']);
+  }
+
+  get newTags() {
+    const uploadedTags = this.getTagsToUpload().map((tag) =>
+      tag.name.toLowerCase()
+    );
+
+    const newTags = uploadedTags
+      .filter((tag) => !this.existingTags.includes(tag) && tag !== '')
+      .map((tag) => `'${tag.trim()}'`)
+      .join(', ');
+
+    return newTags;
+  }
+
+  tagsOnType() {
+    if (this.newTags.length > 0) this.displayNewTags = true;
+    else this.displayNewTags = false;
+  }
+
+  private getTagsToUpload(): TagRequest[] {
+    return (
+      this.uploadForm.controls.tags.value
+        ?.split(',')
+        .map((tag: string) => ({ name: tag.trim() })) ?? []
+    );
   }
 }

@@ -2,6 +2,12 @@
   <div class="container">
     <h1>{{ pdf.title }}</h1>
     <p>{{ pdf.description }}</p>
+    <ng-container *ngIf="pdf.tags.length > 0">
+      <p class="tags-label">Tags:</p>
+      <ul class="tag-list">
+        <li *ngFor="let tag of pdf.tags" class="tag-badge">{{ tag.name }}</li>
+      </ul>
+    </ng-container>
 
     <button (click)="deletePdf()">Delete</button>
   </div>

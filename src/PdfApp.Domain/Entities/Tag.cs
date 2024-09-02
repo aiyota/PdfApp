@@ -6,7 +6,6 @@
 public class Tag
 {
     public int Id { get; set; }
-    //public int PdfId { get; set; }
     public IEnumerable<Pdf> Pdf { get; set; } = default!;   
     public string Name { get; set; } = default!;
 }

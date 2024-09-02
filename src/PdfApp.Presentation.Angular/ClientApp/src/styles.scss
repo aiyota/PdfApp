@@ -1,5 +1,6 @@
 // Variables
 $danger: #fe4f4f;
+$info: #3084fa;
 
 // Utility classes
 .text-danger {
@@ -111,5 +112,9 @@ select {
 
 .invalid-feedback {
   color: $danger;
+  margin-top: 0.2rem;
+}
+.info-feedback {
+  color: $info;
   margin-top: 0.2rem;
 }

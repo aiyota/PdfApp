@@ -12,19 +12,22 @@ namespace PdfApp.Presentation.Api.Controllers;
 public class UserController : ApiControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
     private readonly JwtSettings _jwtSettings;
 
     public UserController(
         IAuthService authService,
+        IUserService userService,
         JwtSettings jwtSettings)
     {
         _authService = authService;
+        _userService = userService;
         _jwtSettings = jwtSettings;
     }
 
     [AllowAnonymous]
     [HttpGet(ApiRoutes.User.Login)]
-    public IActionResult Login(string token)
+    public async Task<IActionResult> Login(string token)
     {
         var user = _authService.GetUserFromToken(token);
 
@@ -32,6 +35,12 @@ public class UserController : ApiControllerBase
         if (user is null)
         {
             return Unauthorized();
+        }
+
+        // save to our database if the user doesn't exist
+        if (await _userService.GetByIdAsync(user.Id) is null)
+        {
+            await _userService.CreateAsync(user.Id, user.UserName, user.Email);
         }
 
         SetTokenAsCookie(token, _jwtSettings.ExpiryMinutes);

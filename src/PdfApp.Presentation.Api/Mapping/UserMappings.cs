@@ -8,7 +8,6 @@ public static class UserMappings
     public static UserResponse DomainToResponse(this User user) =>
         new(
             user.Id,
-            user.FirstName,
-            user.LastName,
+            user.UserName,
             user.Email);
 }

@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
 
         services.AddScoped<IPdfRepository, PdfRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PdfApp.Infrastructure.IoC;
 using PdfApp.Infrastructure.Persistence;
 using PdfApp.Presentation.Api;
@@ -6,8 +7,15 @@ using PdfApp.Presentation.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(
+            builder.Configuration.GetConnectionString("Default"),
+            b => b.MigrationsAssembly("PdfApp.Infrastructure")
+        )
+);
 
 builder.Services
     .AddInfrastructure(builder.Configuration)

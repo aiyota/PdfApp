@@ -29,10 +29,8 @@ public class AuthServiceTests
         var user = new User
         {
             Id = Guid.NewGuid(),
-            FirstName = "Test",
-            LastName = "User",
+            UserName = "Test",
             Email = "test@test.com",
-            PasswordHash = "TestPasswordHash",
         };
 
         var token = _sut.GenerateUserToken(user);

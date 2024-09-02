@@ -5,7 +5,7 @@ import {
   httpPost,
   httpPostFiles,
 } from 'src/app/api/api-utils';
-import { Pdf, PdfUploadRequest } from 'src/app/api/api.types';
+import { Pdf, PdfUploadRequest, Tag } from 'src/app/api/api.types';
 import { environment } from '../../environments/environment';
 
 @Inject({ providedIn: 'root' })
@@ -51,5 +51,13 @@ export default class PdfService {
 
   async deletePdf(pdfId: number): Promise<void> {
     await httpDelete(`${this._baseUrl}/Pdf/${pdfId}`);
+  }
+
+  async getAllTags(): Promise<Tag[]> {
+    const response = await httpGet<{ tags: Tag[] }>(
+      `${this._baseUrl}/Pdf/tags`
+    );
+
+    return response.tags;
   }
 }

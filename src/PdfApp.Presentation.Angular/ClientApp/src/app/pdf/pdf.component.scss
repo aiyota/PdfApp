@@ -2,3 +2,36 @@ embed {
   height: 100vh;
   margin-top: 0.5rem;
 }
+
+.tags-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tag-list {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-badge {
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.85em;
+  display: inline-block;
+}
+
+/* Optional: Add some color variations */
+.tag-badge:nth-child(3n + 1) {
+  background-color: #ffcccb;
+}
+.tag-badge:nth-child(3n + 2) {
+  background-color: #bce3b5;
+}
+.tag-badge:nth-child(3n + 3) {
+  background-color: #b5d8e3;
+}

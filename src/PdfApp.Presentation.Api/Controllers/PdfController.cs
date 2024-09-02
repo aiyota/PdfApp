@@ -63,6 +63,8 @@ public class PdfController : ApiControllerBase
     }
 
     [HttpPost(ApiRoutes.Pdf.Upload)]
+    [RequestSizeLimit(1073741824)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)] 
     public async Task<IActionResult> Upload(int id, [FromForm] UploadPdfRequest request)
     {
         if (request.File.ContentType != MediaTypeNames.Application.Pdf)
@@ -98,6 +100,14 @@ public class PdfController : ApiControllerBase
         await _pdfService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    [HttpGet(ApiRoutes.Pdf.GetTags)]
+    public async Task<IActionResult> GetTags()
+    {
+        var tags = await _pdfService.GetTagsAsync();
+
+        return Ok(new { tags = tags.DomainToResponse() });
     }
 
     private static string CreatePdfFileName()

@@ -23,6 +23,7 @@ public static class ApiRoutes
         public const string Upload = "{id}";
         public const string Update = "{id}";
         public const string Delete = "{id}";
+        public const string GetTags = "tags";
     }
 }
 

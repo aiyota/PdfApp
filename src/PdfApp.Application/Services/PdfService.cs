@@ -79,18 +79,26 @@ public class PdfService : IPdfService
         IEnumerable<Tag>? tags,
         bool? hasFile)
     {
-        var updated = await _pdfRepository.UpdateAsync(
-            id,
-            title,
-            description,
-            author,
-            totalPages,
-            fileName,
-            tags,
-            hasFile)
-                ?? throw new PdfNotFoundException();
+        try
+        {
+            var updated = await _pdfRepository.UpdateAsync(
+                id,
+                title,
+                description,
+                author,
+                totalPages,
+                fileName,
+                tags,
+                hasFile)
+                    ?? throw new PdfNotFoundException();
 
-        return updated;
+            return updated;
+        }
+        catch (InvalidOperationException)
+        {
+            throw new PdfNotFoundException();
+        }
+
     }
 
     public async Task UploadAsync(int id, IFormFile file)
@@ -125,5 +133,10 @@ public class PdfService : IPdfService
    
         File.Delete(filePath);
         return true;
+    }
+
+    public async Task<IEnumerable<Tag>> GetTagsAsync()
+    {
+        return await _pdfRepository.GetAllTagsAsync();
     }
 }

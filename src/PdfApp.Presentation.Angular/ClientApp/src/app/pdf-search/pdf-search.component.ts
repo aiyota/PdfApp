@@ -25,11 +25,8 @@ export class SearchPdfComponent {
     this.pdfSearchStr = target.value;
     this.pdfs = await this.debouncer(async () => {
       const pdfs = await this._pdfService.getPdfs(this.pdfSearchStr);
-      console.log({ pdfs });
       return pdfs;
     });
-
-    console.log(this.pdfs);
   }
 
   async ngOnInit() {

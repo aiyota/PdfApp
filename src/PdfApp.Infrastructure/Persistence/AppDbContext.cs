@@ -17,11 +17,11 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasKey(u => u.Id);
-        modelBuilder.Entity<User>().Property(u => u.FirstName).IsRequired();
-        modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired();
+        modelBuilder.Entity<User>().Property(u => u.UserName).IsRequired();
         modelBuilder.Entity<User>().Property(u => u.Email).IsRequired();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
-        modelBuilder.Entity<User>().Property(u => u.PasswordHash).IsRequired();
+        modelBuilder.Entity<User>().Property(u => u.ModifiedAt).IsRequired(false);
+
 
         modelBuilder.Entity<Pdf>().HasKey(p => p.Id);
         modelBuilder.Entity<Pdf>().Property(p => p.Title).IsRequired();
