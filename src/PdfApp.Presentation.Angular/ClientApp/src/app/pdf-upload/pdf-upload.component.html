@@ -51,7 +51,7 @@
         formControlName="tags"
         type="text"
         placeholder="Tags"
-        (keyup)="tagsOnType()"
+        (keyup)="tagsOnTyping()"
       />
       <p
         *ngIf="displayNewTags && uploadForm.controls.tags.value"

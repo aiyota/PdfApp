@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   DomSanitizer,
@@ -19,6 +19,8 @@ export class PdfComponent {
   pdfSrcSafe?: SafeResourceUrl;
   selectedFile: File | null = null;
 
+  isFullScreen: boolean = false;
+
   constructor(
     private _pdfService: PdfService,
     private _route: ActivatedRoute,
@@ -29,7 +31,7 @@ export class PdfComponent {
 
   async ngOnInit() {
     const id = Number(this._route.snapshot.paramMap.get('id'));
-    const page = Number(this._route.snapshot.queryParamMap.get('page')) || 1;
+    const page = await this.getCurrentPageFromApi(id);
     this.pdf = await this._pdfService.getPdf(id);
     if (this.pdf.hasFile) {
       this.setPdfSrc(this.pdf, page);
@@ -38,9 +40,72 @@ export class PdfComponent {
     this.setTitle(this.pdf?.title || 'Default Title');
   }
 
+  getCurrentPageFromUrl(): number {
+    const page = Number(this._route.snapshot.queryParamMap.get('page')) || 1;
+    return page;
+  }
+
+  saveProgress() {
+    const page = Number(window.prompt('Enter your current page number'));
+    if (!page || !this.pdf) {
+      return;
+    }
+
+    this._pdfService.saveProgress(this.pdf.id, page);
+  }
+
+  async getCurrentPageFromApi(id: number): Promise<number> {
+    const progresses = await this._pdfService.getProgresses(id);
+    if (!progresses.length) {
+      return 1;
+    }
+
+    return progresses[0].page;
+  }
+
+  ngOnDestroy() {
+    // Ensure we exit full-screen mode when component is destroyed
+    if (this.isFullScreen) {
+      this.exitFullScreen();
+    }
+  }
+
   private setPdfSrc(pdf: Pdf, page: number) {
     const pdfSrc = this._pdfService.getPdfUrl(pdf.fileName) + `#page=${page}`;
     this.pdfSrcSafe = this._sanitizer.bypassSecurityTrustResourceUrl(pdfSrc);
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (this.isFullScreen) {
+      this.exitFullScreen();
+    }
+  }
+
+  @HostListener('document:fullscreenchange', ['$event'])
+  @HostListener('document:webkitfullscreenchange', ['$event'])
+  @HostListener('document:mozfullscreenchange', ['$event'])
+  @HostListener('document:MSFullscreenChange', ['$event'])
+  onFullScreenChange() {
+    this.isFullScreen = !!document.fullscreenElement;
+  }
+
+  toggleFullScreen() {
+    this.isFullScreen = !this.isFullScreen;
+    if (this.isFullScreen) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  enterFullScreen() {
+    const elem = document.documentElement;
+    elem?.requestFullscreen();
+  }
+
+  exitFullScreen() {
+    document?.exitFullscreen();
   }
 
   private setTitle(title: string) {

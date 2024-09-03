@@ -1,5 +1,5 @@
 <ng-container *ngIf="!!pdf; else noPdf">
-  <div class="container">
+  <div class="container" [class.fullscreen]="isFullScreen">
     <h1>{{ pdf.title }}</h1>
     <p>{{ pdf.description }}</p>
     <ng-container *ngIf="pdf.tags.length > 0">
@@ -9,16 +9,24 @@
       </ul>
     </ng-container>
 
-    <button (click)="deletePdf()">Delete</button>
+    <ng-container *ngIf="pdf.hasFile; else noPdfFile">
+      <button (click)="toggleFullScreen()">
+        {{ isFullScreen ? "Exit Full Screen" : "View Full Screen" }}
+      </button>
+      <button (click)="saveProgress()">Save Progress</button>
+      <button (click)="deletePdf()">Delete</button>
+
+      <div class="pdf-container" [class.fullscreen]="isFullScreen">
+        <embed
+          [src]="pdfSrcSafe"
+          type="application/pdf"
+          width="100%"
+          height="100%"
+        />
+      </div>
+    </ng-container>
   </div>
 
-  <embed
-    *ngIf="pdf.hasFile; else noPdfFile"
-    [src]="pdfSrcSafe"
-    type="application/pdf"
-    width="100%"
-    height="100%"
-  />
   <ng-template #noPdfFile>
     <div class="container">
       <form (submit)="uploadPdf($event)">

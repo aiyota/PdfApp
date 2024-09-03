@@ -102,7 +102,7 @@ export class PdfUploadComponent implements OnInit {
     return newTags;
   }
 
-  tagsOnType() {
+  tagsOnTyping() {
     if (this.newTags.length > 0) this.displayNewTags = true;
     else this.displayNewTags = false;
   }

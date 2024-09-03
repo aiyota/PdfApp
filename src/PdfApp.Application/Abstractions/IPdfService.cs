@@ -29,4 +29,6 @@ public interface IPdfService
     Task UploadAsync(int id, IFormFile file);
     Task<byte[]> GetPdfFileAsync(string fileName);
     Task<IEnumerable<Tag>> GetTagsAsync();
+    Task SaveProgressAsync(Guid userId, int pdfId, int currentPage);
+    Task<IEnumerable<Progress>> GetProgressesAsync(Guid userId, int pdfId);
 }

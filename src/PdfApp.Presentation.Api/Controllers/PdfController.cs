@@ -6,16 +6,19 @@ using PdfApp.Presentation.Api.Contracts;
 using PdfApp.Presentation.Api.Contracts.Pdf;
 using PdfApp.Presentation.Api.Mapping;
 using PdfApp.Domain.Exceptions;
+using PdfApp.Application.Services;
 
 namespace PdfApp.Presentation.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class PdfController : ApiControllerBase
 {
+    private readonly IAuthService _authService;
     private readonly IPdfService _pdfService;
 
-    public PdfController(IPdfService pdfService)
+    public PdfController(IAuthService authService, IPdfService pdfService)
     {
+        _authService = authService;
         _pdfService = pdfService;
     }
 
@@ -108,6 +111,31 @@ public class PdfController : ApiControllerBase
         var tags = await _pdfService.GetTagsAsync();
 
         return Ok(new { tags = tags.DomainToResponse() });
+    }
+
+    [HttpPost(ApiRoutes.Pdf.SaveProgress)]
+    public async Task<IActionResult> SaveProgress([FromRoute] int pdfId, [FromBody] ProgressRequest request)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        await _pdfService.SaveProgressAsync(user.Id, pdfId, request.Page);
+        var pdf = await _pdfService.GetByIdAsync(pdfId);
+
+        return Ok(new { pdf = pdf.DomainToResponse(), page = request.Page });
+    }
+
+    [HttpGet(ApiRoutes.Pdf.GetProgresses)]
+    public async Task<IActionResult> GetProgresses(int pdfId)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        var progresses = await _pdfService.GetProgressesAsync(user.Id, pdfId);
+
+        return Ok(new { progresses = progresses.DomainToResponse() });
     }
 
     private static string CreatePdfFileName()

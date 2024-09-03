@@ -1,7 +1,41 @@
-<div *ngFor="let pdf of pdfs">
-  <ul>
-    <li>
-      <a routerLink="./pdf/{{ pdf.id }}">{{ pdf.title }}</a>
-    </li>
-  </ul>
+<div class="pdf-list-container">
+  <div *ngFor="let pdf of pdfs" class="pdf-card">
+    <div class="pdf-card-header">
+      <h2 class="pdf-title">
+        <a [routerLink]="['./pdf', pdf.id]">{{ pdf.title }}</a>
+      </h2>
+      <p class="pdf-author">by {{ pdf.author }}</p>
+    </div>
+    <div class="pdf-card-content">
+      <p class="pdf-description">{{ pdf.description }}</p>
+      <div class="pdf-details">
+        <span class="pdf-detail"
+          ><i class="icon-description"></i> {{ pdf.totalPages }} pages</span
+        >
+        <span class="pdf-detail"
+          ><i class="icon-event"></i> Created on
+          {{ pdf.createdOn | date : "mediumDate" }}</span
+        >
+        <!-- <span *ngIf="pdf.lastAccessedOn" class="pdf-detail">
+          <i class="icon-access-time"></i> Last accessed on {{ pdf.lastAccessedOn | date:'mediumDate' }}
+        </span> -->
+      </div>
+      <div class="pdf-tags">
+        <span *ngFor="let tag of pdf.tags" class="pdf-tag">{{ tag.name }}</span>
+      </div>
+    </div>
+    <div class="pdf-card-actions">
+      <button class="btn btn-primary" [routerLink]="['./pdf', pdf.id]">
+        View
+      </button>
+      <a
+        class="btn btn-secondary"
+        *ngIf="pdf.hasFile"
+        target="_blank"
+        [href]="makePdfUrl(pdf.fileName)"
+      >
+        Download
+      </a>
+    </div>
+  </div>
 </div>

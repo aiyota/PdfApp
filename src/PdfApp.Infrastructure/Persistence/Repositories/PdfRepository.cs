@@ -169,4 +169,38 @@ public class PdfRepository : IPdfRepository
         return tagsToAdd;
     }
 
+    /// <summary>
+    /// Saves the progress of the user reading a pdf.
+    /// If the progress already exists, it updates the page number.
+    /// </summary>
+    public async Task SaveProgressAsync(Guid userId, int pdfId, int currentPage)
+    {
+        var progress = await _dbContext.Progresses
+            .FirstOrDefaultAsync(p => p.PdfId == pdfId && p.UserId == userId);
+
+        if (progress is not null)
+        {
+            progress.Page = currentPage;
+        }
+        else
+        {
+            progress = new Progress
+            {
+                Name = "Default",
+                UserId = userId,
+                PdfId = pdfId,
+                Page = currentPage
+            };
+            _dbContext.Progresses.Add(progress);
+        }
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Progress>> GetProgressesAsync(Guid userId, int pdfId)
+    {
+        return await _dbContext.Progresses
+            .Where(p => p.UserId == userId && p.PdfId == pdfId)
+            .ToListAsync();
+    }
 }

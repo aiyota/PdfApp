@@ -25,5 +25,7 @@ public interface IPdfRepository
         IEnumerable<Tag>? tags = null,
         bool? hasFile = null);
     Task DeleteAsync(int id);
+    Task SaveProgressAsync(Guid userId, int pdfId, int currentPage);
+    Task<IEnumerable<Progress>> GetProgressesAsync(Guid userId, int pdfId);
     Task<IEnumerable<Tag>> GetAllTagsAsync();
 }

@@ -1,0 +1,137 @@
+@import "../../styles.scss";
+
+.pdf-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.pdf-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-card-header {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.pdf-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.pdf-title a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.pdf-author {
+  margin: 4px 0 0;
+  color: #757575;
+  font-size: 0.875rem;
+}
+
+.pdf-card-content {
+  padding: 16px;
+  flex-grow: 1;
+}
+
+.pdf-description {
+  margin: 0 0 16px;
+}
+
+.pdf-details {
+  margin-bottom: 16px;
+}
+
+.pdf-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.875rem;
+  color: #616161;
+}
+
+.pdf-detail i {
+  margin-right: 8px;
+}
+
+.pdf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdf-tag {
+  background-color: #e0e0e0;
+  color: #616161;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+}
+
+.pdf-tag:nth-child(3n + 1) {
+  background-color: #ffcccb;
+}
+.pdf-tag:nth-child(3n + 2) {
+  background-color: #bce3b5;
+}
+.pdf-tag:nth-child(3n + 3) {
+  background-color: #b5d8e3;
+}
+
+.pdf-card-actions {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  background-color: #fafafa;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.btn i {
+  margin-right: 8px;
+}
+
+.btn-primary {
+  background-color: $primary;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: darken($primary, 10%);
+}
+
+.btn-secondary {
+  background-color: #616161;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: darken(#616161, 10%);
+}
+
+/* You'll need to add your own icon font or replace these with SVGs */
+.icon-description,
+.icon-event,
+.icon-access-time,
+.icon-visibility,
+.icon-cloud-download {
+  /* Add styles for your icons here */
+}

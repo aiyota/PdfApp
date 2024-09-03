@@ -139,4 +139,14 @@ public class PdfService : IPdfService
     {
         return await _pdfRepository.GetAllTagsAsync();
     }
+
+    public async Task SaveProgressAsync(Guid userId, int pdfId, int currentPage)
+    {
+        await _pdfRepository.SaveProgressAsync(userId, pdfId, currentPage);
+    }
+
+    public async Task<IEnumerable<Progress>> GetProgressesAsync(Guid userId, int pdfId)
+    {
+        return await _pdfRepository.GetProgressesAsync(userId, pdfId);
+    }
 }

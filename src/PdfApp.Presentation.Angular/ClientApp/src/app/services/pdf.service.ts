@@ -5,7 +5,7 @@ import {
   httpPost,
   httpPostFiles,
 } from 'src/app/api/api-utils';
-import { Pdf, PdfUploadRequest, Tag } from 'src/app/api/api.types';
+import { Pdf, PdfUploadRequest, Progress, Tag } from 'src/app/api/api.types';
 import { environment } from '../../environments/environment';
 
 @Inject({ providedIn: 'root' })
@@ -59,5 +59,23 @@ export default class PdfService {
     );
 
     return response.tags;
+  }
+
+  async saveProgress(pdfId: number, page: number): Promise<void> {
+    await httpPost(`${this._baseUrl}/Pdf/progress/${pdfId}`, {
+      page,
+    });
+  }
+
+  async getProgresses(pdfId: number): Promise<Progress[]> {
+    const response = await httpGet<{ progresses: Progress[] }>(
+      `${this._baseUrl}/Pdf/progress/${pdfId}`
+    );
+
+    return response.progresses;
+  }
+
+  getPdfDownloadLink(fileName: string): string {
+    return `${this._baseUrl}/Pdf/file/${fileName}`;
   }
 }

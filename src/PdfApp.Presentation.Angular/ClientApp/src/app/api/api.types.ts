@@ -48,3 +48,9 @@ export type PdfUploadRequest = {
   totalPages: number;
   tags: TagRequest[];
 };
+
+export type Progress = {
+  id: number;
+  name: string;
+  page: number;
+};

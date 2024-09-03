@@ -15,7 +15,7 @@ export type RouteRecord = {
 export class NavbarComponent {
   routes: RouteRecord[] = [
     { name: 'Home', path: appRoutes.home },
-    { name: 'Pdf', path: appRoutes.pdf },
+    // { name: 'Pdf', path: appRoutes.pdf },
     { name: 'Pdf Upload', path: appRoutes.pdfUpload },
   ];
 }
