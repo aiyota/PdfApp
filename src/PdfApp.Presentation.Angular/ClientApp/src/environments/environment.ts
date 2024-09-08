@@ -1,1 +1,5 @@
-export const environment = { production: true, apiUrl: '', authServerUrl: '' };
+export const environment = {
+  production: true,
+  apiUrl: '',
+  authServerUrl: '',
+};

@@ -1,11 +1,12 @@
-﻿using PdfApp.Domain.Entities;
+﻿using PdfApp.Application.Models;
+using PdfApp.Domain.Entities;
 using PdfApp.Presentation.Api.Contracts.Pdf;
 
 namespace PdfApp.Presentation.Api.Mapping;
 
 public static class PdfMappings
 {
-    public static PdfResponse DomainToResponse(this Pdf pdf) =>
+    public static PdfResponse DomainToResponse(this UserPdf pdf) =>
         new()
         {
             Id = pdf.Id,
@@ -17,10 +18,11 @@ public static class PdfMappings
             Tags = pdf.Tags.Select(t => new TagResponse { Id = t.Id, Name = t.Name }),
             CreatedOn = pdf.CreatedOn,
             LastAccessedOn = pdf.LastAccessedOn,
-            HasFile = pdf.HasFile ?? false
+            HasFile = pdf.HasFile ?? false,
+            IsFavorite = pdf.IsFavorite
         };
 
-    public static IList<PdfResponse> DomainToResponse(this IList<Pdf> pdfs) =>
+    public static IList<PdfResponse> DomainToResponse(this IList<UserPdf> pdfs) =>
         pdfs.Select(pdf => pdf.DomainToResponse()).ToList();
 
 }

@@ -1,5 +1,57 @@
 <div class="container">
   <h1>Search Pdfs</h1>
-  <input type="text" (keyup)="searchPdf($event)" placeholder="Search PDF's" />
-  <app-pdf-list [pdfs]="pdfs"></app-pdf-list>
+  <div class="search-form">
+    <div class="input-group">
+      <input
+        type="text"
+        (keyup)="searchPdf($event)"
+        placeholder="Search PDF's"
+        [value]="pdfSearchStr"
+        (keyup)="setSearchStr($event)"
+      />
+    </div>
+    <div class="input-group">
+      <select (keypress)="tagSelected($event)">
+        <option value="0">Select Tag</option>
+        <option *ngFor="let tag of filteredTags" [value]="tag.id">
+          {{ tag.name }}
+        </option>
+      </select>
+
+      <div class="pdf-tags">
+        <span class="pdf-tag" *ngFor="let tag of selectedTags">
+          {{ tag.name }}
+          <button class="remove-tag-btn" (click)="removeTag(tag)">
+            &times;
+          </button>
+        </span>
+      </div>
+
+      <div class="clear-all-btn-container" *ngIf="showClearTagButton">
+        <button class="btn btn-secondary btn-sm" (click)="clearTags()">
+          Clear Tags
+        </button>
+      </div>
+
+      <div>
+        <button
+          [ngClass]="{
+            'btn-primary': !isFavoriteSearch,
+            'btn-warning': isFavoriteSearch
+          }"
+          class="btn show-favorites-btn"
+          (click)="toggleFavoriteSearch()"
+        >
+          {{ isFavoriteSearch ? "Show All" : "Show Favorites" }}
+        </button>
+
+        <button class="btn btn-secondary" (click)="resetSearch()">Reset</button>
+      </div>
+    </div>
+  </div>
+  <app-pdf-list
+    (setFavoriteEvent)="onSetFavorite($event)"
+    [pdfs]="pdfs"
+    [isLoading]="isLoading"
+  ></app-pdf-list>
 </div>

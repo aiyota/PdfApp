@@ -1,5 +1,4 @@
-import { Component, HostListener } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import {
   DomSanitizer,
   SafeResourceUrl,
@@ -15,6 +14,8 @@ import PdfService from 'src/app/services/pdf.service';
   styleUrls: ['./pdf.component.scss'],
 })
 export class PdfComponent {
+  @ViewChild('pdfDialog') pdfDialog: any;
+
   pdf?: Pdf;
   pdfSrcSafe?: SafeResourceUrl;
   selectedFile: File | null = null;
@@ -31,18 +32,13 @@ export class PdfComponent {
 
   async ngOnInit() {
     const id = Number(this._route.snapshot.paramMap.get('id'));
-    const page = await this.getCurrentPageFromApi(id);
+    let page = await this.getPage();
     this.pdf = await this._pdfService.getPdf(id);
     if (this.pdf.hasFile) {
       this.setPdfSrc(this.pdf, page);
     }
 
     this.setTitle(this.pdf?.title || 'Default Title');
-  }
-
-  getCurrentPageFromUrl(): number {
-    const page = Number(this._route.snapshot.queryParamMap.get('page')) || 1;
-    return page;
   }
 
   saveProgress() {
@@ -54,7 +50,22 @@ export class PdfComponent {
     this._pdfService.saveProgress(this.pdf.id, page);
   }
 
-  async getCurrentPageFromApi(id: number): Promise<number> {
+  async getPage() {
+    let page = this.getCurrentPageFromUrl();
+    if (!page) {
+      page = await this.getCurrentPageFromApi();
+    }
+
+    return page;
+  }
+
+  getCurrentPageFromUrl(): number | null {
+    const page = this._route.snapshot.queryParamMap.get('page');
+    return page ? Number(page) : null;
+  }
+
+  async getCurrentPageFromApi(): Promise<number> {
+    const id = Number(this._route.snapshot.paramMap.get('id'));
     const progresses = await this._pdfService.getProgresses(id);
     if (!progresses.length) {
       return 1;
@@ -148,5 +159,30 @@ export class PdfComponent {
     this._pdfService.deletePdf(this.pdf.id);
 
     this._router.navigate(['/']);
+  }
+
+  openDialog() {
+    this.pdfDialog.nativeElement.showModal();
+  }
+
+  closeDialog() {
+    this.pdfDialog.nativeElement.close();
+  }
+
+  onUpdateComplete() {
+    this.closeDialog();
+    this.ngOnInit();
+  }
+
+  async setFavorite() {
+    if (!this.pdf) return;
+    this.pdf.isFavorite = !this.pdf.isFavorite;
+
+    if (this.pdf.isFavorite) {
+      await this._pdfService.addFavorite(this.pdf.id);
+      return;
+    }
+
+    await this._pdfService.removeFavorite(this.pdf.id);
   }
 }

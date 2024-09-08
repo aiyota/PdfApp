@@ -1,9 +1,36 @@
 export async function httpPost<TData, TReturn>(
   url: string,
+  data?: TData,
+  noResponse: boolean = false
+): Promise<TReturn | null> {
+  if (!data) {
+    data = {} as TData;
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+
+  if (noResponse) {
+    return null;
+  }
+
+  const responseData = await response.json();
+
+  return responseData as TReturn;
+}
+
+export async function httpPatch<TData, TReturn>(
+  url: string,
   data?: TData
 ): Promise<TReturn> {
   const response = await fetch(url, {
-    method: 'POST',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
     },

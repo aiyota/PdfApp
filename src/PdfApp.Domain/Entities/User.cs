@@ -7,4 +7,5 @@ public class User
     public string Email { get; set; } = default!;
     public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
+    public IEnumerable<FavoritePdf> FavoritePdfs { get; set; } = default!;
 }

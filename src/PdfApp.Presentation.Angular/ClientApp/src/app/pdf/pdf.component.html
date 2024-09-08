@@ -1,7 +1,27 @@
 <ng-container *ngIf="!!pdf; else noPdf">
+  <dialog #pdfDialog>
+    <button class="btn btn-secondary float-right" (click)="closeDialog()">
+      &times;
+    </button>
+    <app-pdf-upload
+      (updateComplete)="onUpdateComplete()"
+      [pdf]="pdf"
+    ></app-pdf-upload>
+  </dialog>
+
   <div class="container" [class.fullscreen]="isFullScreen">
     <h1>{{ pdf.title }}</h1>
     <p>{{ pdf.description }}</p>
+    <div class="home-btn-container">
+      <a class="btn btn-primary btn-sm home-btn" routerLink="/">Go Home</a>
+      <button
+        [ngClass]="pdf.isFavorite ? 'btn-success' : 'btn-secondary'"
+        class="btn btn-sm"
+        (click)="setFavorite()"
+      >
+        {{ pdf.isFavorite ? "Remove Favorite" : "Add Favorite" }}
+      </button>
+    </div>
     <ng-container *ngIf="pdf.tags.length > 0">
       <p class="tags-label">Tags:</p>
       <ul class="tag-list">
@@ -10,11 +30,14 @@
     </ng-container>
 
     <ng-container *ngIf="pdf.hasFile; else noPdfFile">
-      <button (click)="toggleFullScreen()">
-        {{ isFullScreen ? "Exit Full Screen" : "View Full Screen" }}
+      <button class="btn btn-primary" (click)="toggleFullScreen()">
+        {{ isFullScreen ? "Exit Full Screen" : "Full Screen" }}
       </button>
-      <button (click)="saveProgress()">Save Progress</button>
-      <button (click)="deletePdf()">Delete</button>
+      <button class="btn btn-success" (click)="saveProgress()">
+        Save Progress
+      </button>
+      <button class="btn btn-warning" (click)="openDialog()">Edit</button>
+      <button class="btn btn-danger" (click)="deletePdf()">Delete</button>
 
       <div class="pdf-container" [class.fullscreen]="isFullScreen">
         <embed

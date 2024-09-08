@@ -30,6 +30,7 @@ export type Pdf = {
   createdOn: string;
   lastAccessed: string;
   hasFile: boolean;
+  isFavorite: boolean;
 };
 
 export type Tag = {

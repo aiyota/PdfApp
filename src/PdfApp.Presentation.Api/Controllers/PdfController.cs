@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Mime;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PdfApp.Application.Abstractions;
+using PdfApp.Domain.Exceptions;
 using PdfApp.Presentation.Api.Abstractions;
 using PdfApp.Presentation.Api.Contracts;
 using PdfApp.Presentation.Api.Contracts.Pdf;
 using PdfApp.Presentation.Api.Mapping;
-using PdfApp.Domain.Exceptions;
-using PdfApp.Application.Services;
+using System.Net.Mime;
 
 namespace PdfApp.Presentation.Api.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class PdfController : ApiControllerBase
@@ -22,12 +23,24 @@ public class PdfController : ApiControllerBase
         _pdfService = pdfService;
     }
 
-    [HttpGet(ApiRoutes.Pdf.Get)]
-    public async Task<IActionResult> Get([FromQuery] string? title = null)
+    [AllowAnonymous]
+    [HttpGet("/health")]
+    public IActionResult HealthCheck()
     {
+        return Ok(new { message = "Healthy" });
+    }
+
+    [HttpGet(ApiRoutes.Pdf.Get)]
+    public async Task<IActionResult> Get([FromQuery] string? title = null, string? tags = null)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+               return Unauthorized();
+
+        string[] tagsArray = tags?.Split(',') ?? [];
         var pdfs = (title is not null) 
-            ?  await _pdfService.GetByTitleAsync(title)
-            :  await _pdfService.GetAllAsync();
+            ?  await _pdfService.GetByTitleAsync(user.Id, title, tagsArray)
+            :  await _pdfService.GetAllAsync(user.Id, tagsArray);
 
         return Ok(new { pdfs = pdfs.DomainToResponse() });
     }
@@ -42,7 +55,11 @@ public class PdfController : ApiControllerBase
     [HttpGet(ApiRoutes.Pdf.GetById)]
     public async Task<IActionResult> Get(int id)
     {
-        var pdf = await _pdfService.GetByIdAsync(id);
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        var pdf = await _pdfService.GetByIdAsync(user.Id, id);
 
         return Ok(new { pdf = pdf.DomainToResponse() });
     }
@@ -81,7 +98,12 @@ public class PdfController : ApiControllerBase
     [HttpPatch(ApiRoutes.Pdf.Update)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdatePdfRequest request)
     {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
         var pdf = await _pdfService.UpdateAsync(
+            user.Id,
             id,
             request.Title,
             request.Description,
@@ -96,7 +118,11 @@ public class PdfController : ApiControllerBase
     [HttpDelete(ApiRoutes.Pdf.Delete)]
     public async Task<IActionResult> Delete(int id)
     {
-        var pdf = await _pdfService.GetByIdAsync(id);
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        var pdf = await _pdfService.GetByIdAsync(user.Id, id);
         if (pdf is null)
             throw new PdfNotFoundException();
 
@@ -121,7 +147,7 @@ public class PdfController : ApiControllerBase
             return Unauthorized();
 
         await _pdfService.SaveProgressAsync(user.Id, pdfId, request.Page);
-        var pdf = await _pdfService.GetByIdAsync(pdfId);
+        var pdf = await _pdfService.GetByIdAsync(user.Id, pdfId);
 
         return Ok(new { pdf = pdf.DomainToResponse(), page = request.Page });
     }
@@ -136,6 +162,43 @@ public class PdfController : ApiControllerBase
         var progresses = await _pdfService.GetProgressesAsync(user.Id, pdfId);
 
         return Ok(new { progresses = progresses.DomainToResponse() });
+    }
+
+    [HttpPost(ApiRoutes.Pdf.AddToFavorites)]
+    public async Task<IActionResult> AddToFavorites(int pdfId)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        await _pdfService.AddToFavorites(user.Id, pdfId);
+
+        return Ok();
+    }
+
+    [HttpGet(ApiRoutes.Pdf.GetUserFavoritePdfs)]
+    public async Task<IActionResult> GetUserFavoritePdfs([FromQuery] string? title = null, string? tags = null)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        string[] tagsArray = tags?.Split(',') ?? [];
+        var pdfs = await _pdfService.GetUserFavoritePdfs(user.Id, title, tagsArray);
+
+        return Ok(new { pdfs = pdfs.DomainToResponse() });
+    }
+
+    [HttpDelete(ApiRoutes.Pdf.RemoveFromFavorites)]
+    public async Task<IActionResult> RemoveFromFavorites(int pdfId)
+    {
+        var user = _authService.GetUserFromClaimsPrinciple(User);
+        if (user is null)
+            return Unauthorized();
+
+        await _pdfService.RemoveFromFavorites(user.Id, pdfId);
+
+        return Ok();
     }
 
     private static string CreatePdfFileName()

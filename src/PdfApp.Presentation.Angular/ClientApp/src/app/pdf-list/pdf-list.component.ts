@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Pdf } from 'src/app/api/api.types';
-import PdfService from '../services/pdf.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -9,10 +8,13 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./pdf-list.component.scss'],
 })
 export class PdfListComponent {
+  @Output() setFavoriteEvent = new EventEmitter<Pdf>();
+  @Input() isLoading: boolean = false;
   @Input() pdfs: Pdf[] = [];
   baseUrl: string = environment.apiUrl;
 
-  makePdfUrl(fileName: string): string {
-    return `${this.baseUrl}/Pdf/file/${fileName}`;
+  setFavorite(pdf: Pdf): void {
+    pdf.isFavorite = !pdf.isFavorite;
+    this.setFavoriteEvent.emit(pdf);
   }
 }

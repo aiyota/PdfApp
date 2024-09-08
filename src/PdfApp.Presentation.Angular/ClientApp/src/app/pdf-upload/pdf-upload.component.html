@@ -1,6 +1,11 @@
 <div class="container">
-  <h1>Pdf Upload</h1>
-  <form [formGroup]="uploadForm" (ngSubmit)="uploadPdf()">
+  <h1>Pdf {{ pdf ? "Edit" : "Upload" }}</h1>
+
+  <form
+    *ngIf="!isLoading; else loading"
+    [formGroup]="uploadForm"
+    (ngSubmit)="uploadPdf()"
+  >
     <div class="form-control">
       <label for="title">Title</label>
       <input formControlName="title" type="text" placeholder="Title" />
@@ -46,22 +51,22 @@
     </div>
 
     <div class="form-control">
-      <label for="totalPages">Tags</label>
+      <label for="totalPages">Tags (Separated by comma)</label>
       <input
         formControlName="tags"
         type="text"
         placeholder="Tags"
         (keyup)="tagsOnTyping()"
       />
-      <p
+      <div
         *ngIf="displayNewTags && uploadForm.controls.tags.value"
         class="info-feedback"
       >
         <span>New tags to be added:</span><br />
-        <span
-          ><strong>{{ newTags }}</strong></span
-        >
-      </p>
+        <ul class="tag-list">
+          <li *ngFor="let tag of newTags" class="tag-badge">{{ tag }}</li>
+        </ul>
+      </div>
     </div>
 
     <div class="form-control">
@@ -76,6 +81,19 @@
         Must upload a PDF
       </p>
     </div>
-    <button type="submit" [disabled]="uploadForm.invalid">Submit</button>
+
+    <button
+      class="btn btn-success"
+      type="submit"
+      [disabled]="uploadForm.invalid"
+    >
+      Submit
+    </button>
   </form>
+
+  <ng-template #loading>
+    <div class="loading-container">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  </ng-template>
 </div>

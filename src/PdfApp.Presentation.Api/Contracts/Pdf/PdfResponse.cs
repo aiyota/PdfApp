@@ -14,4 +14,5 @@ public record PdfResponse
     public DateTime CreatedOn { get; init; }
     public DateTime? LastAccessedOn { get; init; }
     public bool HasFile { get; set; }
+    public bool IsFavorite { get; set; }
 }

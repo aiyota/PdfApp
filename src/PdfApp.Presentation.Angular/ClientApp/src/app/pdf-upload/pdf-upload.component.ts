@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import PdfService from '../services/pdf.service';
-import { Tag, TagRequest } from '../api/api.types';
+import { Pdf, Tag, TagRequest } from '../api/api.types';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,6 +13,9 @@ export class PdfUploadComponent implements OnInit {
   pdfUploadFile: File | null = null;
   existingTags: string[] = [];
   displayNewTags = false;
+  @Input() pdf: Pdf | null = null;
+  @Output() updateComplete = new EventEmitter<void>();
+  isLoading = false;
 
   uploadForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -26,9 +29,34 @@ export class PdfUploadComponent implements OnInit {
   constructor(private _pdfService: PdfService, private _router: Router) {}
 
   ngOnInit(): void {
+    this.setPdfUploadValidator();
+
     this._pdfService.getAllTags().then((tags) => {
       this.existingTags = tags.map((tag) => tag.name.toLowerCase());
     });
+
+    if (this.pdf) {
+      this.uploadForm.controls.title.setValue(this.pdf.title);
+      this.uploadForm.controls.description.setValue(this.pdf.description);
+      this.uploadForm.controls.author.setValue(this.pdf.author);
+      this.uploadForm.controls.totalPages.setValue(this.pdf.totalPages);
+      this.uploadForm.controls.tags.setValue(
+        this.pdf.tags.map((tag) => tag.name).join(', ')
+      );
+    }
+  }
+
+  // Dynamically set validator based on whether the pdf is provided
+  setPdfUploadValidator(): void {
+    if (this.pdf) {
+      // If a PDF is provided, remove the 'required' validator for pdfUpload
+      this.uploadForm.get('pdfUpload')?.clearValidators();
+    } else {
+      // If no PDF is provided, add the 'required' validator for pdfUpload
+      this.uploadForm.get('pdfUpload')?.setValidators([Validators.required]);
+    }
+    // Update the validity of the control after changing validators
+    this.uploadForm.get('pdfUpload')?.updateValueAndValidity();
   }
 
   get titleIsInvalid() {
@@ -48,6 +76,8 @@ export class PdfUploadComponent implements OnInit {
   }
 
   get pdfUploadIsInvalid() {
+    if (this.pdf) return false;
+
     return this.getValidStatus('pdfUpload', ['required']);
   }
 
@@ -79,13 +109,24 @@ export class PdfUploadComponent implements OnInit {
       tags: this.getTagsToUpload(),
     };
 
-    // get id
+    if (this.pdf) {
+      this.isLoading = true;
+      await this._pdfService.updatePdf(this.pdf.id, pdfUploadRequest);
+      if (this.pdfUploadFile)
+        await this._pdfService.uploadPdf(this.pdf.id, this.pdfUploadFile);
+      this.isLoading = false;
+
+      this.pdfUploadFile = null;
+      this.uploadForm.controls.pdfUpload.setValue(null);
+      this.updateComplete.emit();
+
+      return;
+    }
+
+    this.isLoading = true;
     const newPdf = await this._pdfService.createPdfRecord(pdfUploadRequest);
-
-    // submit file upload
-
     await this._pdfService.uploadPdf(newPdf.id, this.pdfUploadFile!);
-
+    this.isLoading = false;
     this._router.navigate(['/']);
   }
 
@@ -96,8 +137,7 @@ export class PdfUploadComponent implements OnInit {
 
     const newTags = uploadedTags
       .filter((tag) => !this.existingTags.includes(tag) && tag !== '')
-      .map((tag) => `'${tag.trim()}'`)
-      .join(', ');
+      .map((tag) => tag.trim());
 
     return newTags;
   }

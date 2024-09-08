@@ -26,6 +26,9 @@ public static class ApiRoutes
         public const string GetTags = "tags";
         public const string SaveProgress = "progress/{pdfId}";
         public const string GetProgresses = "progress/{pdfId}";
+        public const string AddToFavorites = "favorites/{pdfId}";
+        public const string GetUserFavoritePdfs = "favorites";
+        public const string RemoveFromFavorites = "favorites/{pdfId}";
     }
 }
 

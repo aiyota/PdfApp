@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using PdfApp.Application.Abstractions;
+using PdfApp.Application.Mapping;
+using PdfApp.Application.Models;
 using PdfApp.Domain.Abstractions;
 using PdfApp.Domain.Entities;
 using PdfApp.Domain.Exceptions;
@@ -18,7 +20,7 @@ public class PdfService : IPdfService
         _configuration = configuration;
     }
 
-    public async Task<Pdf> CreateAsync(
+    public async Task<UserPdf> CreateAsync(
         string title,
         string? description,
         string? author,
@@ -37,7 +39,7 @@ public class PdfService : IPdfService
             hasFile) 
                 ?? throw new PdfNotFoundException();
 
-        return created;
+        return created.ToModel();
     }
 
     public async Task DeleteAsync(int id)
@@ -51,25 +53,28 @@ public class PdfService : IPdfService
         DeletePdfFile(pdf.FileName);
     }
 
-    public async Task<IList<Pdf>> GetAllAsync()
+    public async Task<IList<UserPdf>> GetAllAsync(Guid userId, IList<string>? tags = null)
     {
-        return await _pdfRepository.GetAllAsync();
+        var pdfs = await _pdfRepository.GetAllAsync(tags);
+        return await SetFavorites(userId, pdfs);
     }
 
-    public async Task<Pdf> GetByIdAsync(int id)
+    public async Task<UserPdf> GetByIdAsync(Guid userId, int id)
     {
         var pdf = await _pdfRepository.GetByIdAsync(id)
             ?? throw new PdfNotFoundException();
      
-        return pdf;
+        return await SetFavorite(userId, pdf);
     }
 
-    public async Task<IList<Pdf>> GetByTitleAsync(string title)
+    public async Task<IList<UserPdf>> GetByTitleAsync(Guid userId, string title, IList<string>? tags = null)
     {
-        return await _pdfRepository.GetByTitleAsync(title);
+        var pdfs = await _pdfRepository.GetByTitleAsync(title, tags);
+        return await SetFavorites(userId, pdfs);
     }
 
-    public async Task<Pdf> UpdateAsync(
+    public async Task<UserPdf> UpdateAsync(
+        Guid userId,
         int id,
         string? title,
         string? description,
@@ -92,7 +97,7 @@ public class PdfService : IPdfService
                 hasFile)
                     ?? throw new PdfNotFoundException();
 
-            return updated;
+            return await SetFavorite(userId, updated);
         }
         catch (InvalidOperationException)
         {
@@ -135,9 +140,9 @@ public class PdfService : IPdfService
         return true;
     }
 
-    public async Task<IEnumerable<Tag>> GetTagsAsync()
+    public async Task<IList<Tag>> GetTagsAsync()
     {
-        return await _pdfRepository.GetAllTagsAsync();
+        return (await _pdfRepository.GetAllTagsAsync()).ToList();
     }
 
     public async Task SaveProgressAsync(Guid userId, int pdfId, int currentPage)
@@ -145,8 +150,52 @@ public class PdfService : IPdfService
         await _pdfRepository.SaveProgressAsync(userId, pdfId, currentPage);
     }
 
-    public async Task<IEnumerable<Progress>> GetProgressesAsync(Guid userId, int pdfId)
+    public async Task<IList<Progress>> GetProgressesAsync(Guid userId, int pdfId)
     {
-        return await _pdfRepository.GetProgressesAsync(userId, pdfId);
+        return (await _pdfRepository.GetProgressesAsync(userId, pdfId)).ToList();
+    }
+
+    public async Task AddToFavorites(Guid userId, int pdfId)
+    {
+        await _pdfRepository.AddToFavorites(userId, pdfId);
+    }
+
+    public async Task<IList<UserPdf>> GetUserFavoritePdfs(Guid userId, string? title = null, IEnumerable<string>? tags = null)
+    {
+        var pdfs = (await _pdfRepository.GetUserFavoritePdfs(userId, title, tags))
+            .Select(p =>
+            {
+                var model = p.ToModel();
+                model.IsFavorite = true;
+
+                return model;
+            }).ToList();
+        
+        return pdfs;
+    }
+
+    public async Task RemoveFromFavorites(Guid userId, int pdfId)
+    {
+        await _pdfRepository.RemoveFromFavorites(userId, pdfId);
+    }
+
+    private async Task<IList<UserPdf>> SetFavorites(Guid userId, IList<Pdf> pdfs)
+    {
+        var favoritePdfs = await _pdfRepository.GetUserFavoritePdfs(userId);
+        return pdfs.Select(p =>
+        {
+            var model = p.ToModel();
+            model.IsFavorite = favoritePdfs.Any(f => f.Id == p.Id);
+            return model;
+        }).ToList();
+    }
+
+    private async Task<UserPdf> SetFavorite(Guid userId, Pdf pdf)
+    {
+        var favoritePdfs = await _pdfRepository.GetUserFavoritePdfs(userId);
+        var model = pdf.ToModel();
+        model.IsFavorite = favoritePdfs.Any(f => f.Id == pdf.Id);
+        
+        return model;
     }
 }

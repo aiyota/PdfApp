@@ -14,3 +14,7 @@ export function makeDebouncer<TReturn>(
       timeoutId = window.setTimeout(() => resolve(fn()), delay);
     });
 }
+
+export function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}

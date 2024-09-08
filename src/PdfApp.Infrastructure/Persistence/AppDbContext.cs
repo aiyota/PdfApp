@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Pdf> Pdfs { get; set; } = default!;
     public DbSet<Tag> Tags { get; set; } = default!;
     public DbSet<Progress> Progresses { get; set; } = default!;
+    public DbSet<FavoritePdf> FavoritePdfs { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,5 +49,18 @@ public class AppDbContext : DbContext
             .IsRequired();
         modelBuilder.Entity<Progress>().Property(p => p.Name).IsRequired();
         modelBuilder.Entity<Progress>().Property(p => p.Page).IsRequired();
+
+        modelBuilder.Entity<FavoritePdf>()
+            .HasKey(fp => fp.Id);
+
+        modelBuilder.Entity<FavoritePdf>()
+            .HasOne(fp => fp.User)
+            .WithMany(u => u.FavoritePdfs)
+            .HasForeignKey(fp => fp.UserId);
+
+        modelBuilder.Entity<FavoritePdf>()
+            .HasOne(fp => fp.Pdf)
+            .WithMany(p => p.FavoritedBy)
+            .HasForeignKey(fp => fp.PdfId);
     }
 }

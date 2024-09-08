@@ -10,9 +10,8 @@ import { Router } from '@angular/router';
 import PdfService from 'src/app/services/pdf.service';
 import { PdfListComponent } from './pdf-list/pdf-list.component';
 import { PdfComponent } from './pdf/pdf.component';
-import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { SharedModule } from './shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { PdfUploadComponent } from './pdf-upload/pdf-upload.component';
 import { HttpClientModule } from '@angular/common/http';
 

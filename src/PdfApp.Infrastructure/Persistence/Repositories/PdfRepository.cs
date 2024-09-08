@@ -53,10 +53,11 @@ public class PdfRepository : IPdfRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<IList<Pdf>> GetAllAsync()
+    public async Task<IList<Pdf>> GetAllAsync(IList<string>? tags = null)
     {
         return await _dbContext.Pdfs
             .Include(p => p.Tags)
+            .Where(x => tags == null || !tags.Any() || x.Tags.Any(t => tags.Contains(t.Name)))
             .ToListAsync();
     }
 
@@ -67,11 +68,12 @@ public class PdfRepository : IPdfRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IList<Pdf>> GetByTitleAsync(string title)
+    public async Task<IList<Pdf>> GetByTitleAsync(string title, IList<string>? tags = null)
     {
         return await _dbContext.Pdfs
             .Include(p => p.Tags)
             .Where(x => EF.Functions.Like(x.Title, $"%{title}%"))
+            .Where(x => tags == null || !tags.Any() || x.Tags.Any(t => tags.Contains(t.Name)))
             .ToListAsync();
     }
 
@@ -151,6 +153,7 @@ public class PdfRepository : IPdfRepository
     {
         return await _dbContext.Tags
             .Include(t => t.Pdf)
+            .OrderBy(t => t.Name)
             .ToListAsync();
     }
 
@@ -202,5 +205,50 @@ public class PdfRepository : IPdfRepository
         return await _dbContext.Progresses
             .Where(p => p.UserId == userId && p.PdfId == pdfId)
             .ToListAsync();
+    }
+
+    public async Task AddToFavorites(Guid userId, int pdfId)
+    {
+        var favoritePdf = new FavoritePdf
+        {
+            UserId = userId,
+            PdfId = pdfId
+        };
+
+        _dbContext.FavoritePdfs.Add(favoritePdf);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Pdf>> GetUserFavoritePdfs(Guid userId, string? title = null, IEnumerable<string>? tags = null)
+    {
+        var pdfs = _dbContext.FavoritePdfs
+            .Where(fp => fp.UserId == userId)
+            .Include(fp => fp.Pdf)
+                .ThenInclude(p => p.Tags)
+            .Select(fp => fp.Pdf);
+
+        if (title is not null)
+        {
+            pdfs = pdfs.Where(p => EF.Functions.Like(p.Title, $"%{title}%"));
+        }
+
+        if (tags is not null && tags.Count() > 0)
+        {
+            pdfs = pdfs.Where(p => p.Tags.Any(t => tags.Contains(t.Name)));
+        }
+
+        return await pdfs.ToListAsync();
+    }
+
+    public async Task RemoveFromFavorites(Guid userId, int pdfId)
+    {
+        var favoritePdf = await _dbContext.FavoritePdfs
+            .FirstOrDefaultAsync(fp => fp.UserId == userId && fp.PdfId == pdfId);
+
+        if (favoritePdf is not null)
+        {
+            _dbContext.FavoritePdfs.Remove(favoritePdf);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

@@ -2,6 +2,7 @@ import { Inject } from '@angular/core';
 import {
   httpDelete,
   httpGet,
+  httpPatch,
   httpPost,
   httpPostFiles,
 } from 'src/app/api/api-utils';
@@ -12,8 +13,15 @@ import { environment } from '../../environments/environment';
 export default class PdfService {
   private _baseUrl: string = environment.apiUrl;
 
-  async getPdfs(pdfTitle?: string): Promise<Pdf[]> {
-    const queryString = pdfTitle ? `?title=${pdfTitle}` : '';
+  async getPdfs(pdfTitle?: string, tags?: string[]): Promise<Pdf[]> {
+    let queryString = pdfTitle ? `?title=${encodeURIComponent(pdfTitle)}` : '';
+
+    if (tags && tags.length > 0) {
+      let tagsQueryString = queryString ? '&' : '?';
+      tagsQueryString += 'tags=' + encodeURIComponent(tags.join(','));
+      queryString += tagsQueryString;
+    }
+
     const response = await httpGet<{ pdfs: Pdf[] }>(
       `${this._baseUrl}/Pdf${queryString}`
     );
@@ -33,7 +41,7 @@ export default class PdfService {
       pdf
     );
 
-    return response.pdf;
+    return response!.pdf;
   }
 
   async uploadPdf(pdfId: number, file: File): Promise<Pdf> {
@@ -43,6 +51,15 @@ export default class PdfService {
     await httpPostFiles(`${this._baseUrl}/Pdf/${pdfId}`, formData);
 
     return this.getPdf(pdfId);
+  }
+
+  async updatePdf(pdfId: number, pdf: PdfUploadRequest): Promise<Pdf> {
+    const response = await httpPatch<PdfUploadRequest, { pdf: Pdf }>(
+      `${this._baseUrl}/Pdf/${pdfId}`,
+      pdf
+    );
+
+    return response.pdf;
   }
 
   getPdfUrl(fileName: string): string {
@@ -73,6 +90,30 @@ export default class PdfService {
     );
 
     return response.progresses;
+  }
+
+  async getFavoritePdfs(pdfTitle?: string, tags?: string[]): Promise<Pdf[]> {
+    let queryString = pdfTitle ? `?title=${encodeURIComponent(pdfTitle)}` : '';
+
+    if (tags && tags.length > 0) {
+      let tagsQueryString = queryString ? '&' : '?';
+      tagsQueryString += 'tags=' + encodeURIComponent(tags.join(','));
+      queryString += tagsQueryString;
+    }
+
+    const response = await httpGet<{ pdfs: Pdf[] }>(
+      `${this._baseUrl}/Pdf/favorites${queryString}`
+    );
+
+    return response.pdfs;
+  }
+
+  async addFavorite(pdfId: number): Promise<void> {
+    await httpPost(`${this._baseUrl}/Pdf/favorites/${pdfId}`, null, true);
+  }
+
+  async removeFavorite(pdfId: number): Promise<void> {
+    await httpDelete(`${this._baseUrl}/Pdf/favorites/${pdfId}`);
   }
 
   getPdfDownloadLink(fileName: string): string {
